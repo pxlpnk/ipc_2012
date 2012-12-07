@@ -20,3 +20,9 @@ MPI 1 stencil                     |         |        |
 MPI 2 prefix-sums                 |         |        |
 MPI 3 matrix-vector multiply      |         |        |
 MPI 4 bucket sort                 |         |        |
+
+Guidelines, Style etc.
+======================
+* Use uint for "normal" integer stuff like counters, indices etc.
+* FIXME: stuff to fix before delivery
+* TODO: woule be nice, but not mandatory
