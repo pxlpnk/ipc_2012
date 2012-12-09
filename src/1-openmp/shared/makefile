@@ -2,6 +2,7 @@ ATYPE ?= int
 ATYPEPRINT ?= "\"08d\"" #printf characters for ATYPE
 SHELL = /bin/sh
 CWD := $(shell pwd)
+CC ?= gcc
 P := $(shell dirname $(CWD))
 EXE ?= $(shell basename $(P))-$(shell basename $(CWD)).exe
 CFLAGS ?= -fopenmp -Wall -std=gnu99 -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT)
