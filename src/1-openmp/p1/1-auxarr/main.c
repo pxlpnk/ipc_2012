@@ -6,12 +6,11 @@
 #include <omp.h>
 #include "../../../shared/util.h"
 
-bool Scan(ATYPE *arr, uint n, uint *opsp)
-{
+bool Scan(ATYPE *arr, uint n, uint *opsp) {
 	if (n == 1)
 		return true;
 
-	ATYPE *tmp = malloc(sizeof(ATYPE) * n);
+	ATYPE *tmp = malloc(sizeof(ATYPE) * n/2);
 	if (tmp == NULL)
 		return false;
 
@@ -24,8 +23,7 @@ bool Scan(ATYPE *arr, uint n, uint *opsp)
 		for (i = 0; i < n/2; i++) {
 			tmp[i] = arr[2*i] + arr[2*i + 1];
 			ops++;
-		}
-		// implicit barrier
+		} // implicit barrier
 
 		#pragma omp single
 		{
@@ -51,20 +49,16 @@ bool Scan(ATYPE *arr, uint n, uint *opsp)
 	return ret;
 }
 
-bool printArrs(ATYPE *a, ATYPE *b, uint n) {
-	for (uint i = 0; i < n; i++) {
-		printf("[%03d]:\t%" ATYPEPRINT, i, a[i]);
-		printf("\t%s    ", (a[i] != b[i]) ? "!=    " : "      ");
-		printf("%" ATYPEPRINT "\n", b[i]);
-	}
-	printf("\n");
-	return false;
-}
-
 int main (int argc, char *argv[]) {
 	uint nt = (argv[1] != NULL) ? atoi(argv[1]) : 0; // TODO: error handling
 	if (nt > 0)
 		omp_set_num_threads(nt);
+
+	uint n = (argv[2] != NULL) ? atoi(argv[2]) : 0; // TODO: error handling
+	if (n == 0) {
+		printf("N not given!\n");
+		return EXIT_FAILURE;
+	}
 
 	#pragma omp parallel
 	{
@@ -72,8 +66,6 @@ int main (int argc, char *argv[]) {
 		nt = omp_get_num_threads();
 	}
 
-	//uint n = 1<<20; // 1MB
-	uint n = 5;
 	ATYPE *arr = malloc(sizeof(ATYPE) * n);
 	if (arr == NULL)
 		return EXIT_FAILURE;

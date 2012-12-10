@@ -16,3 +16,9 @@ ATYPE *fillArr(ATYPE *arr, uint n);
 
 /* calculates and returns the sum of elements in arr and puts the prefix sums in sums. */
 uint prefixSums(ATYPE *arr, uint n, bool exclusive, ATYPE * sums);
+
+/* print the array with indices */
+void printArray(ATYPE *a, uint n);
+
+/* print two arrays side by side with indices and show differences in elements */
+void printArrs(ATYPE *a, ATYPE *b, uint n);

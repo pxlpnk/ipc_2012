@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "util.h"
 
 uint randRange(uint min, uint max) {
@@ -34,3 +35,20 @@ uint prefixSums(ATYPE *arr, uint n, bool exclusive, ATYPE * sums) {
 	}
 	return sum;
 }
+
+void printArray(ATYPE *a, uint n) {
+	for (uint i = 0; i < n; i++) {
+		printf("[%03d]:\t%" ATYPEPRINT "\n", i, a[i]);
+	}
+	printf("\n");
+}
+
+void printArrs(ATYPE *a, ATYPE *b, uint n) {
+	for (uint i = 0; i < n; i++) {
+		printf("[%03d]:\t%" ATYPEPRINT, i, a[i]);
+		printf("\t%s    ", (a[i] != b[i]) ? "!=    " : "      ");
+		printf("%" ATYPEPRINT "\n", b[i]);
+	}
+	printf("\n");
+}
+
