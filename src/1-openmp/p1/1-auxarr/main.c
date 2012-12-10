@@ -6,7 +6,6 @@
 #include <omp.h>
 #include "../../../shared/util.h"
 
-// FIXME: still buggy :P
 bool Scan(ATYPE *arr, uint n, uint *opsp)
 {
 	if (n == 1)
@@ -21,17 +20,19 @@ bool Scan(ATYPE *arr, uint n, uint *opsp)
 	#pragma omp parallel reduction(&&: ret), reduction(+: ops)
 	{
 		unsigned int i;
-		#pragma omp parallel for
+		#pragma omp for
 		for (i = 0; i < n/2; i++) {
 			tmp[i] = arr[2*i] + arr[2*i + 1];
 			ops++;
 		}
 		// implicit barrier
 
-		ret = Scan(tmp, n/2, &ops);
-		#pragma omp barrier
+		#pragma omp single
+		{
+			ret = Scan(tmp, n/2, &ops);
+			arr[1] = tmp[0];
+		} // implicit barrier
 
-		arr[1] = tmp[0];
 		#pragma omp for nowait
 		for (i = 1; i < n/2; i++) {
 			arr[2*i] = tmp[i-1] + arr[2*i];
@@ -44,7 +45,7 @@ bool Scan(ATYPE *arr, uint n, uint *opsp)
 			arr[n-1] = tmp[n/2-1] + arr[n-1];
 			ops++;
 		}
-	}
+	} // implicit barrier
 
 	*opsp = ops;
 	return ret;
