@@ -7,7 +7,7 @@
 #include "../../../shared/util.h"
 
 // FIXME: still buggy :P
-bool Scan(ATYPE *arr, unsigned int n)
+bool Scan(ATYPE *arr, uint n, uint *opsp)
 {
 	if (n == 1)
 		return true;
@@ -17,29 +17,36 @@ bool Scan(ATYPE *arr, unsigned int n)
 		return false;
 
 	bool ret = true;
-	#pragma omp parallel reduction(&&: ret)
+	uint ops = *opsp;
+	#pragma omp parallel reduction(&&: ret), reduction(+: ops)
 	{
 		unsigned int i;
 		#pragma omp parallel for
-		for (i = 0; i < n/2; i++)
+		for (i = 0; i < n/2; i++) {
 			tmp[i] = arr[2*i] + arr[2*i + 1];
+			ops++;
+		}
 		// implicit barrier
 
-		if (!Scan(tmp, n/2))
-			ret = false;
+		ret = Scan(tmp, n/2, &ops);
 		#pragma omp barrier
 
 		arr[1] = tmp[0];
 		#pragma omp for nowait
 		for (i = 1; i < n/2; i++) {
 			arr[2*i] = tmp[i-1] + arr[2*i];
+			ops++;
 			arr[2*i + 1] = tmp[i];
 		}
 		#pragma omp single nowait
+		{
 		if (odd(n))
-			arr[n-1] = tmp[n/2-1]+arr[n-1];
+			arr[n-1] = tmp[n/2-1] + arr[n-1];
+			ops++;
+		}
 	}
 
+	*opsp = ops;
 	return ret;
 }
 
@@ -57,12 +64,11 @@ int main (int argc, char *argv[]) {
 	uint nt = (argv[1] != NULL) ? atoi(argv[1]) : 0; // TODO: error handling
 	if (nt > 0)
 		omp_set_num_threads(nt);
-	double time = omp_get_wtime();
 
 	#pragma omp parallel
 	{
 		#pragma omp  single
-		printf("There are %d threads\n",omp_get_num_threads());
+		nt = omp_get_num_threads();
 	}
 
 	//uint n = 1<<20; // 1MB
@@ -79,17 +85,25 @@ int main (int argc, char *argv[]) {
 
 	prefixSums(arr, n, false, cor);
 
-	Scan(arr, n);
+	uint ops = 0;
+	double time = omp_get_wtime();
+	bool ret = Scan(arr, n, &ops);
+	time = omp_get_wtime() - time;
+	if (!ret) {
+		printf("Scan returned an error!\n");
+		goto out;
+	}
+	printf("%d additions of array elements executed in %lf seconds by %d threads\n", ops, time, nt);
+
 	if (n < 100)
 		printArrs(cor, arr, n);
 
 	printf("Correct? %s\n", memcmp(cor, arr, sizeof(ATYPE) * n) == 0 ? "yes" : "no");
 
+out:
 	free(cor);
 	free(arr);
 
-	time = omp_get_wtime() - time;
-	printf("%lf seconds.\n",time);
-	return EXIT_SUCCESS;
+	return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
