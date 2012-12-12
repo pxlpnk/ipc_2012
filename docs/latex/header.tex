@@ -1,0 +1,235 @@
+\documentclass[
+	a4paper,
+	11pt,
+	twoside,
+	openany,
+	english,
+	article
+]{memoir}
+\usepackage{multicol}
+\usepackage[english]{babel}
+
+\usepackage{lipsum}
+\usepackage[iso]{isodate} % there is only one legit date format.
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc} % umlaute im output als single chars
+
+% damit die pdfreader page 1 bei mainmatter page 1 haben
+\usepackage{zref-abspage,zref-user}
+\makeatletter
+\AtBeginDocument{%
+  \zref@refused{pagenumstart}%
+  \hypersetup{%
+    pdfstartpage=\zref@extractdefault{pagenumstart}{abspage}{1}%
+  }%
+}
+\makeatother
+
+% suppress the page number after in the fronmatter/\maketitle
+\usepackage{etoolbox}
+\makeatletter
+\aliaspagestyle{title}{empty}
+\let\origps@chapter\ps@chapter
+\preto\frontmatter{\let\ps@chapter\ps@empty\pagestyle{empty}}
+\preto\mainmatter{%
+  \cleardoublepage
+  \let\ps@chapter\origps@chapter\pagestyle{headings}}
+\makeatother
+
+%\usepackage{aeguill} % schöne (vektor?)schriften in verbindung mit umlauten
+
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+\usepackage{epstopdf}
+\epstopdfsetup{update,outdir=./output/images/}
+
+% on the fly convert integrated svg to pdf
+%http://wiki.inkscape.org/wiki/index.php/Tools#svg2pdf
+% preamble: the svg
+%\begin{filecontents*}{packets.svg}
+%\input{images/packets.svg}
+%\end{filecontents*}
+% in the body something like:
+%\begin{figure}
+%\centering
+%\immediate\write18{svg2pdf mypicture.svg  mypicture.pdf}%
+%\includegraphics{mypicture.pdf}
+%\caption{...}\label{...}
+%\end{figure}
+
+% attach files to pdf
+%\usepackage{embedfile}
+
+%\usepackage{array} % mehr table options
+%\usepackage{ctable}
+%\usepackage{threeparttable}
+\usepackage{booktabs} % \toprule \midrule \bottomrule etc
+\usepackage[table]{xcolor}
+\definecolor{lightgray}{gray}{0.9}
+\usepackage{multirow}
+%\usepackage{rotating}
+\usepackage{pdflscape}
+\usepackage{diagbox}
+%\usepackage{footnote}
+%\usepackage{datatool}
+%\renewcommand{\thempfootnote}{\arabic{mpfootnote}} % arabic footnotes in minipages
+
+% source code listings
+%\usepackage{listings}
+%\usepackage{color} % colored fonts etc.
+%\definecolor{listinggray}{gray}{1}
+%\definecolor{colGrey}{rgb}{0.96,0.96,0.96}
+%\definecolor{colKeys}{rgb}{0,0,0.5}
+%\definecolor{colIdentifier}{rgb}{0,0,0}
+%\definecolor{colComments}{rgb}{0,0.5,0}
+%\definecolor{colString}{rgb}{0,0,1}
+%\lstset{%
+%language=XML,
+%numbers=left,
+%basicstyle=\fontfamily{pcr}\small,
+%backgroundcolor=\color{colGrey},
+%keywordstyle=\color{colKeys}\bfseries,
+%identifierstyle=\color{colIdentifier},
+%commentstyle=\color{colComments},
+%stringstyle=\color{colString},
+%columns=fixed,
+%showstringspaces=true,
+%}
+
+%\usepackage{setspace}
+%\usepackage{amsmath} % für \begin{align} für multiline equations
+%\usepackage{amssymb} % für smileys und andere symbole
+% \input kvmacros % für kv diagramme
+
+\newenvironment{keywords}%
+   {\begin{trivlist}\item[]{\bfseries\sffamily Keywords:}\ }
+   {\end{trivlist}}
+
+\newcommand{\tsub}{\textsubscript}
+\newcommand{\tsup}{\textsuperscript}
+\newcommand{\fixme}[1]{\textcolor{red}{[#1]}}
+
+\bibliographystyle{alphaurl} % (custom) bibtex style
+
+\copypagestyle{numberCorner}{plain}
+\makeevenfoot{numberCorner}{\thepage}{}{}
+\makeoddfoot{numberCorner}{}{}{\thepage}
+\makeevenfoot{plain}{\thepage}{}{}
+\makeoddfoot{plain}{}{}{\thepage}
+\aliaspagestyle{chapter}{numberCorner}
+
+%\usepackage{TUINFDA} % tu template style
+\newcommand{\thesiskeywords}{Masters's thesis} % default keywords
+
+\InputIfFileExists{private}{}{} % defines macros like thesis title etc. mainly used on the titlepages
+
+\usepackage[stable,norule,multiple,marginal]{footmisc} % für footnotes in section headers, aber nicht in toc etc.
+\makeatletter
+\renewcommand\@makefntext[1]{\leftskip=3em\hskip-2em\@makefnmark~#1%
+	\ifnum\the\spacefactor<3000.\fi} % add a full stop if there is none
+\makeatother
+%\usepackage{tablefootnote}
+%\renewcommand\footnoterule{} % remove line above footnotes
+
+\usepackage[pagebackref]{hyperref}
+%\usepackage{bookmark}
+\hypersetup{
+	%pdftex,
+	%pdfauthor={\tuinfthesisauthor},
+	%pdftitle={\tuinfthesistitle},
+	%pdfkeywords={\thesiskeywords},
+	unicode=true,
+	%pagebackref, % does not work, why?
+	%pagebackref=true, % does not work, why?
+	%hyperindex=true, % default
+	%breaklinks=true, % default
+	%plainpages=false, % default
+	%colorlinks=true,	% false: boxed links; true: colored links
+	%linkcolor=black,	% color of internal links
+	%citecolor=black,	% color of links to bibliography
+	%filecolor=black,	% color of file links
+	%urlcolor=black,		% color of external links
+	citebordercolor=0 0 0,	% hmpf!
+	filebordercolor=0 0 0,
+	linkbordercolor=0 0 0,
+	menubordercolor=0 0 0,
+	urlbordercolor=0 0 0,
+	pdfborderstyle={/S/U /W 0.2}, % stroke, underline, width 0.2
+	pdfstartview={FitV},
+	%bookmarks=true, % default
+	bookmarksnumbered=true,
+	bookmarksopen=true,
+	%hyperfootnotes=false,
+}
+\usepackage[all]{hypcap} % fix caption anchors
+\renewcommand{\backreflastsep}{, } % does not work (yet?)
+\renewcommand*{\backref}[1]{} % default interface disabled
+\renewcommand*{\backrefalt}[4]{%
+	%1. Number of citations without dupes.
+	%2. Back references list without dupes.
+	%3. Number of all citations (with dupes).
+	%4. Back reference list with all entries (with dupes).
+	Cited on page%
+	\ifnum#1>1 %
+		s%
+	\fi %
+	{:} #2{.}
+}
+
+\usepackage[
+	shortcuts,
+	toc,
+	translate=false,
+	acronym,
+	nostyles,
+	nomain
+]{glossaries}
+%\usepackage{relsize} % needed for glossaries' smaller
+
+\newcommand*{\acro}[3]{%label, abbr, text
+\newacronym[user1={#3}]{#1}{#2}{#3}%
+}
+\newcommand*{\acrol}[4]{%label, abbr, text, desc
+\newacronym[user1={#3},description={#4}]{#1}{#2}{\glsentryuseri{#1}}%
+}
+\newcommand*{\acrop}[4]{%label, abbr, text, plural
+\newacronym[user1={#3},\glslongpluralkey={#4}]{#1}{#2}{\glsentryuseri{#1}}%
+}
+\newcommand*{\acrolp}[5]{%label, abbr, text, desc, plural
+\newacronym[user1={#3},description={#4},\glslongpluralkey={#5}]{#1}{#2}{\glsentryuseri{#1}}%
+}
+
+% to get rid of the additional "Acronyms" title
+\makeatletter
+\renewcommand{\glossarysection}[2][\@gls@title]{%
+\def\@gls@title{#2}%
+\begin{multicols}{2}%
+\@ifundefined{phantomsection}{%
+\@glossarysection{#1}{#2}}{\@p@glossarysection{#1}{#2}}%
+%\glossarymark{\glossarytoctitle}%
+}
+\makeatother
+\setlength{\columnsep}{1cm}
+\renewcommand*{\glossarypostamble}{\end{multicols}}
+\renewcommand*{\glsclearpage}{\clearpage} % instead of cleardoublepage
+
+% customize the acronym printing to include the long form AND the description
+\newglossarystyle{mylist}{%
+  \renewenvironment{theglossary}%
+    {\begin{description}}{\end{description}}%
+  \renewcommand*{\glossaryentryfield}[5]{%
+    \item[\glstarget{##1}{##2}]\glsentryuseri{##1}\space {\footnotesize (pp. ##5)}%
+      \ifthenelse{\equal{\relax ##3}{\relax\glsentryuseri{##1}}}{}{\newline ##3\glspostdescription}%
+  }%
+  %\renewcommand*{\glossaryheader}{}%
+  %\renewcommand*{\glsgroupheading}[1]{}%
+  %\renewcommand*{\glossarysubentryfield}[6]{%
+    %\par\glstarget{##2}{\strut}##4\glspostdescription\space ##6%
+  %}%
+  %\renewcommand*{\glsgroupskip}{}%
+}
+\makeglossaries
+
+\newcommand{\X}[1]{#1\index{#1}} % shortcut for index
+\newcommand{\Xtt}[1]{\texttt{#1}\index{#1}} % shortcut for index+typewriter fonts... used to index classes and methods
+\makeindex

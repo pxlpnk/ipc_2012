@@ -1,0 +1,20 @@
+--- b/makeglossaries
++++ a/makeglossaries
+@@ -73,6 +73,7 @@
+ # v1.0 (2007-05-10) : Initial release.
+ 
+ use Getopt::Std;
++use File::Basename;
+ use strict;
+ # v2.01 added the following line
+ use warnings;
+@@ -617,7 +618,8 @@
+ 
+ sub makeindex{
+    my($in,$out,$trans,$ist,$rest,$quiet,$dontexec) = @_;
++   my $path = dirname($out);
++   $ist = "$path/$ist";
+-
+    my $args = "$rest -s \"$ist\" -t \"$trans\" -o \"$out\" \"$in\"";
+ 
+ # v2.01 replaced code with call to &run_app

@@ -1,0 +1,75 @@
+\input{header}
+
+\title{VU Introduction to Parallel Computing (184.710)}
+\posttitle{\par\end{center}\vskip 2 cm}
+\author{Andereas Tiefenthaler \small 0726241, 534 \\
+\small \href{mailto:at@an-ti.eu}{at@an-ti.eu} \\\\
+Stefan Tauner \small 0427514, 938 \\
+\small \href{mailto:stefan.tauner@student.tuwien.ac.at}{stefan.tauner@student.tuwien.ac.at} }
+\date{\today}
+
+\begin{document}
+\input{acronyms}
+
+\pagenumbering{gobble}
+\frontmatter
+
+\maketitle
+\vfill
+
+%\selectlanguage{ngerman}
+%\input{chapters/0-titlepage}
+%\cleardoublepage
+%
+%\selectlanguage{english}
+%\input{chapters/0-titlepage_en}
+%\cleardoublepage
+%
+%\selectlanguage{ngerman}
+%\input{chapters/0-erklaerung}
+%\cleardoublepage
+%
+%\selectlanguage{english}
+%\input{chapters/0-abstract}
+%\cleardoublepage
+%
+%\selectlanguage{ngerman}
+%\input{chapters/0-abstract_de}
+%\selectlanguage{english}
+%\cleardoublepage
+%
+\setcounter{tocdepth}{1}
+\tableofcontents*
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%   MAINMATTER    %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\mainmatter
+\pagestyle{numberCorner}
+\pagenumbering{arabic}
+\zlabel{pagenumstart}
+%
+% lists go here
+%\listoffigures
+%\listoftables
+
+\input{chapters/1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%   APPENDIX    %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\cleardoublepage % ensures that even pages are left and odd pages are right *sigh*
+\pagenumbering{Roman}
+\appendix
+
+\bibliography{bibliography}	% file names without ending
+
+%\clearpage
+%\printglossary[type=\acronymtype,style=mylist]
+%
+%\clearpage
+%\printindex
+
+\end{document}
