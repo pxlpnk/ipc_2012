@@ -4,34 +4,34 @@
 #include "matrix_vector_mul.h"
 
 
-void compute_ref(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *ref_output) {
-  printf("reference:\n");
+uint compute_ref(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *ref_output) {
 
   double time = omp_get_wtime();
   matrix_vector_mult_ref(matrix, vector, n, m, ref_output);
 	time = omp_get_wtime() - time;
 
   printf("%lf seconds.\n", time);
+  return time;
 }
 
-void compute_false_sharing(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
-  printf("tiling outer loop(false_sharing):\n");
+uint compute_false_sharing(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
 
   double time = omp_get_wtime();
   matrix_vector_mult_false_sharing(matrix, vector, n, m, output);
   time = omp_get_wtime() - time;
 
   printf("%lf seconds.\n",time);
+  return time;
 }
 
-void compute_tiling_outer_loop(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
-  printf("tiling outer loop propper:\n");
+uint compute_tiling_outer_loop(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
 
   double time = omp_get_wtime();
   matrix_vector_mult(matrix, vector, n, m, output);
   time = omp_get_wtime() - time;
 
   printf("%lf seconds.\n",time);
+  return time;
 }
 
 
@@ -101,12 +101,14 @@ int main (int argc, char *argv[]) {
 
   printf("Starting computation:\n");
 
+  printf("reference:\n");
   compute_ref(matrix, vector, n, m, ref_output);
 
   for(uint i = 1; i<= nt; i++) {
 
     omp_set_num_threads(i);
 
+    printf("tiling outer loop(false_sharing):\n");
     compute_false_sharing(matrix, vector, n, m, product);
 
     if ( !testResult(product, ref_output, n)) {
@@ -121,6 +123,7 @@ int main (int argc, char *argv[]) {
       return 1;
     }
 
+    printf("tiling outer loop propper:\n");
     compute_tiling_outer_loop(matrix, vector, n, m, product);
 
     if ( !testResult(product, ref_output, n)) {
