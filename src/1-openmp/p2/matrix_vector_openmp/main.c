@@ -101,7 +101,7 @@ int main (int argc, char *argv[]) {
   ref_output = (ATYPE *) malloc(sizeof(ATYPE) * n);
   if (ref_output == NULL) {
     fprintf(stderr, "Out of memory\n");
-    return NULL;
+    return 1;
   }
 
   // add some data to our matrix
@@ -137,7 +137,7 @@ int main (int argc, char *argv[]) {
   product = (ATYPE *) malloc(sizeof(ATYPE) *n);
   if(product == NULL) {
     fprintf(stderr,"Out of memory\n");
-    return NULL;
+    return 1;
   }
 
 
