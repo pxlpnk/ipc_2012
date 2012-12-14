@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <omp.h>
 #include "matrix_vector_mul.h"
-#include "../../../shared/util.h"
 
 
 void compute_ref(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *ref_output) {
@@ -38,11 +37,11 @@ void compute_tiling_outer_loop(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATY
 
 
 int main (int argc, char *argv[]) {
-  int n = 400;
-  int m = 4000;
-  int nt = 20;
+  uint n = 400;
+  uint m = 4000;
+  uint nt = 3;
 
-  omp_set_num_threads(nt);
+
 
   printf("setting up data structures\n");
 
@@ -104,27 +103,31 @@ int main (int argc, char *argv[]) {
 
   compute_ref(matrix, vector, n, m, ref_output);
 
-  compute_false_sharing(matrix, vector, n, m, product);
+  for(uint i = 1; i<= nt; i++) {
 
-  if ( !testResult(product, ref_output, n)) {
-    printf("=======> Wrong result\n");
-    return 1;
+    omp_set_num_threads(i);
+
+    compute_false_sharing(matrix, vector, n, m, product);
+
+    if ( !testResult(product, ref_output, n)) {
+      printf("=======> Wrong result\n");
+      return 1;
+    }
+
+    free(product);
+    product = (ATYPE *) malloc(sizeof(ATYPE) *n);
+    if(product == NULL) {
+      fprintf(stderr,"Out of memory\n");
+      return 1;
+    }
+
+    compute_tiling_outer_loop(matrix, vector, n, m, product);
+
+    if ( !testResult(product, ref_output, n)) {
+      printf("=======> Wrong result\n");
+      return 1;
+    }
   }
-
-  free(product);
-  product = (ATYPE *) malloc(sizeof(ATYPE) *n);
-  if(product == NULL) {
-    fprintf(stderr,"Out of memory\n");
-    return 1;
-  }
-
-  compute_tiling_outer_loop(matrix, vector, n, m, product);
-
-  if ( !testResult(product, ref_output, n)) {
-    printf("=======> Wrong result\n");
-    return 1;
-  }
-
   // cleaning up
   free(vector);
   for(int i=0; i<n; i++) {
