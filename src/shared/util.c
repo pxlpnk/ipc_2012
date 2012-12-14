@@ -52,3 +52,23 @@ void printArrs(ATYPE *a, ATYPE *b, uint n) {
 	printf("\n");
 }
 
+
+void print_matrix(ATYPE **matrix, uint m, uint n) {
+  printf("#### MATRIX\n");
+  for (uint i = 0; i < n; i++) {
+    printf("[%d] ", i);
+    for (uint j = 0; j < m; j++) {
+      printf("%d ", matrix[i][j]);
+    }
+    printf("\n");
+  }
+}
+
+ATYPE **fillMatrix(ATYPE **matrix, uint m, uint n) {
+  for (uint i=0; i<n; i++) {
+    for (uint j=0; j<m; j++) {
+      matrix[i][j] = ((j*i) % 42) + m;
+    }
+  }
+  return matrix;
+}
