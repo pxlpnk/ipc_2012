@@ -64,11 +64,20 @@ void print_matrix(ATYPE **matrix, uint m, uint n) {
   }
 }
 
-ATYPE **fillMatrix(ATYPE **matrix, uint m, uint n) {
+ATYPE **fillMatrix(ATYPE **matrix, uint n, uint m) {
   for (uint i=0; i<n; i++) {
     for (uint j=0; j<m; j++) {
       matrix[i][j] = ((j*i) % 42) + m;
     }
   }
   return matrix;
+}
+
+
+bool testResult(ATYPE *vector, ATYPE *reference, uint n) {
+  for(uint i = 1; i<n; i++) {
+    if (vector[i] != reference[i])
+      return false;
+  }
+  return true;
 }

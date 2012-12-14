@@ -48,10 +48,6 @@ int main (int argc, char *argv[]) {
   int n = 0;
   int m = 0;
 
-  /* uint nt = (argv[1] != NULL) ? atoi(argv[1]) : 0; // TODO: error handling */
-	/* if (nt > 0) */
-	/* 	omp_set_num_threads(nt); */
-
   if (argc != 3) {
     n = 1000;
     m = 100;
@@ -61,16 +57,14 @@ int main (int argc, char *argv[]) {
   }
 
   printf("setting up data structures\n");
-  // preparing data structures
 
-  // matrix
+  // preparing data structures
 
   ATYPE *vector = NULL;
   ATYPE *product = NULL;
   ATYPE *ref_output = NULL;
 
-
-  printf("foo");
+  // matrix
 
   ATYPE **matrix = (ATYPE **) malloc(sizeof(ATYPE *) * n);
   if (matrix == NULL) {
@@ -90,7 +84,6 @@ int main (int argc, char *argv[]) {
   matrix = fillMatrix(matrix, n, m);
 
   // vector
-
   vector = (ATYPE *) malloc(sizeof(ATYPE) * m);
   if (vector == NULL) {
       fprintf(stderr,"Out of memory\n");
@@ -121,7 +114,6 @@ int main (int argc, char *argv[]) {
 
   printf("Starting computation:\n");
 
-
   printf("reference:\n");
   double ref_time = omp_get_wtime();
   matrix_vector_mult_ref(matrix, vector, n, m, ref_output);
@@ -136,6 +128,10 @@ int main (int argc, char *argv[]) {
   time = omp_get_wtime() - time;
   printf("%lf seconds.\n",time);
 
+  if ( !testResult(product, ref_output, n)) {
+    printf("=======> Wrong result\n");
+    return 1;
+  }
 
   free(product);
   product = (ATYPE *) malloc(sizeof(ATYPE) *n);
@@ -151,6 +147,10 @@ int main (int argc, char *argv[]) {
   time = omp_get_wtime() - time;
   printf("%lf seconds.\n",time);
 
+  if ( !testResult(product, ref_output, n)) {
+    printf("=======> Wrong result\n");
+    return 1;
+  }
 
   // cleaning up
   free(vector);

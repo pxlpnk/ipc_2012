@@ -28,3 +28,6 @@ void print_matrix(ATYPE **matrix, uint m, uint n);
 
 /* creates a nxm matrix, fills it with predefined data and returns it */
 ATYPE **fillMatrix(ATYPE **matrix, uint m, uint n);
+
+/* tests if two vectors are equal */
+bool testResult(ATYPE *vector, ATYPE *reference, uint n);
