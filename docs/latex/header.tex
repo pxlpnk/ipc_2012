@@ -6,6 +6,12 @@
 	english,
 	article
 ]{memoir}
+\usepackage{siunitx}
+\usepackage{longtable}
+
+\usepackage{stackrel}
+\newcommand*{\textstackrel}[2]{\ensuremath{\stackrel{\hbox{#1}}{\hbox{#2}}}}
+
 \usepackage{multicol}
 \usepackage[english]{babel}
 
@@ -73,6 +79,10 @@
 %\usepackage{footnote}
 %\usepackage{datatool}
 %\renewcommand{\thempfootnote}{\arabic{mpfootnote}} % arabic footnotes in minipages
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.5.1}
+\usepackage{pgfplotstable}
 
 % source code listings
 %\usepackage{listings}
