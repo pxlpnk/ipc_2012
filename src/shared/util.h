@@ -22,3 +22,9 @@ void printArray(ATYPE *a, uint n);
 
 /* print two arrays side by side with indices and show differences in elements */
 void printArrs(ATYPE *a, ATYPE *b, uint n);
+
+/* prints a matrix */
+void print_matrix(ATYPE **matrix, uint m, uint n);
+
+/* creates a nxm matrix, fills it with predefined data and returns it */
+ATYPE **fillMatrix(ATYPE **matrix, uint m, uint n);

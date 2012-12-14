@@ -3,10 +3,6 @@
 #include <omp.h>
 #include "../../../shared/util.h"
 
-
-void print_vector(ATYPE *v, int m);
-void print_matrix(ATYPE **matrix, int m, int n);
-
 void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, int n, int m, ATYPE *y) {
   for(int i=0; i<n; i++) {
     y[i]=0;
@@ -48,35 +44,6 @@ void matrix_vector_mult_false_sharing(ATYPE **x, ATYPE *a, int n, int m, ATYPE *
 
 
 
-void print_vector(ATYPE *v, int m) {
-  printf("#### VECTOR\n");
-  for (int i=0; i<m; i++) {
-    printf("[%d] %d\n", i, v[i]);
-  }
-}
-
-
-void print_matrix(ATYPE **matrix, int m, int n) {
-  printf("#### MATRIX\n");
-  for (int i = 0; i < n; i++) {
-    printf("[%d] ", i);
-    for (int j = 0; j < m; j++) {
-      printf("%d ", matrix[i][j]);
-    }
-    printf("\n");
-  }
-}
-
-
-ATYPE sum_vector(ATYPE *v, int n) {
-  int aggregate = 0;
-  for(int i=0; i<n; i++) {
-    aggregate += v[i];
-  }
-  return aggregate;
-}
-
-
 int main (int argc, char *argv[]) {
   int n = 0;
   int m = 0;
@@ -97,26 +64,33 @@ int main (int argc, char *argv[]) {
   // preparing data structures
 
   // matrix
-  ATYPE ** matrix;
-  ATYPE *vector;
-  ATYPE *product;
-  ATYPE *ref_output;
 
-  matrix = (ATYPE **) malloc(sizeof(ATYPE *) * n);
+  ATYPE *vector = NULL;
+  ATYPE *product = NULL;
+  ATYPE *ref_output = NULL;
+
+
+  printf("foo");
+
+  ATYPE **matrix = (ATYPE **) malloc(sizeof(ATYPE *) * n);
   if (matrix == NULL) {
     fprintf(stderr, "Out of memory\n");
-    return 1;
+    return NULL;
   }
 
-  for (int i=0; i<n; i++) {
+  for (uint i = 0; i < n; i++) {
     matrix[i] = (ATYPE *) malloc(sizeof(ATYPE) * m);
     if (matrix[i] == NULL) {
-      fprintf(stderr,"Out of memory\n");
-      return 1;
+      fprintf(stderr, "Out of memory\n");
+      return NULL;
     }
   }
 
+
+  matrix = fillMatrix(matrix, n, m);
+
   // vector
+
   vector = (ATYPE *) malloc(sizeof(ATYPE) * m);
   if (vector == NULL) {
       fprintf(stderr,"Out of memory\n");
@@ -139,12 +113,7 @@ int main (int argc, char *argv[]) {
 
   // add some data to our matrix
 
-  for (int i=0; i<n; i++) {
-    for (int j=0; j<m; j++) {
-      matrix[i][j] = ((j*i) % 42) + m;
-    }
-  }
-
+  vector = fillArr(vector, m);
 
   for(int i=0; i<m; i++) {
     vector[i]=i+m;
@@ -181,11 +150,6 @@ int main (int argc, char *argv[]) {
   matrix_vector_mult(matrix, vector, n, m, product);
   time = omp_get_wtime() - time;
   printf("%lf seconds.\n",time);
-
-
-  /* print_vector(vector,m); */
-  /* print_matrix(matrix, m, n); */
-  /* print_vector(product, m); */
 
 
   // cleaning up
