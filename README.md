@@ -4,7 +4,7 @@
 | --------------------------------- | ------------ | ----------- | ---------- | ---- |
 | 2/3 projects, OpenMP OR pthreads  |              |             |            |      |
 | OpenMP 1 prefix-sums              |              |     90%     |     0%     | 10%  |
-| OpenMP 2 matrix-vector multiply   |       %      |             |     0%     |  0%  |
+| OpenMP 2 matrix-vector multiply   |     90%      |             |     0%     |  0%  |
 | OpenMP 3 Parallel merge           |              |             |            |      |
 | pthreads 1 prefix-sums            |              |             |            |      |
 | pthreads 2 matrix-vector multiply |              |             |            |      |
@@ -34,6 +34,7 @@
 	mögliche wert(generatoren): counter, random, constant, best/worst case (pro algo, wie?)
 *	welche hosts?
 *	wieviele threads?
+*	2D probleme sollen nach n und m geplottet werden
 
 ## plot generation
 outputs nach `/data/#-<framework>/p<#>/` (wie /src)
