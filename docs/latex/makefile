@@ -29,10 +29,10 @@ clean:
 $(TEX_OUT): *.tex chapters/*tex *.bib
 	$(TEX) $(TEX_MAIN)
 	$(BIB) $(OUTDIR)$(JOB)
-	$(IDX) $(OUTDIR)$(JOB).idx
-	$(ACR) $(OUTDIR)$(JOB)
+	#$(IDX) $(OUTDIR)$(JOB).idx
+	#$(ACR) $(OUTDIR)$(JOB)
 	$(TEX) $(TEX_MAIN)
-	$(ACR) $(OUTDIR)$(JOB)
+	#$(ACR) $(OUTDIR)$(JOB)
 	$(TEX) $(TEX_MAIN)
 
 .PHONY = clean view all fast

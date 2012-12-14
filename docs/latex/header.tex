@@ -186,60 +186,59 @@
 	{:} #2{.}
 }
 
-\usepackage[
-	shortcuts,
-	toc,
-	translate=false,
-	acronym,
-	nostyles,
-	nomain
-]{glossaries}
+%\usepackage[
+	%shortcuts,
+	%toc,
+	%translate=false,
+	%acronym,
+	%nostyles,
+	%nomain
+%]{glossaries}
 %\usepackage{relsize} % needed for glossaries' smaller
 
-\newcommand*{\acro}[3]{%label, abbr, text
-\newacronym[user1={#3}]{#1}{#2}{#3}%
-}
-\newcommand*{\acrol}[4]{%label, abbr, text, desc
-\newacronym[user1={#3},description={#4}]{#1}{#2}{\glsentryuseri{#1}}%
-}
-\newcommand*{\acrop}[4]{%label, abbr, text, plural
-\newacronym[user1={#3},\glslongpluralkey={#4}]{#1}{#2}{\glsentryuseri{#1}}%
-}
-\newcommand*{\acrolp}[5]{%label, abbr, text, desc, plural
-\newacronym[user1={#3},description={#4},\glslongpluralkey={#5}]{#1}{#2}{\glsentryuseri{#1}}%
-}
-
+%\newcommand*{\acro}[3]{%label, abbr, text
+%\newacronym[user1={#3}]{#1}{#2}{#3}%
+%}
+%\newcommand*{\acrol}[4]{%label, abbr, text, desc
+%\newacronym[user1={#3},description={#4}]{#1}{#2}{\glsentryuseri{#1}}%
+%}
+%\newcommand*{\acrop}[4]{%label, abbr, text, plural
+%\newacronym[user1={#3},\glslongpluralkey={#4}]{#1}{#2}{\glsentryuseri{#1}}%
+%}
+%\newcommand*{\acrolp}[5]{%label, abbr, text, desc, plural
+%\newacronym[user1={#3},description={#4},\glslongpluralkey={#5}]{#1}{#2}{\glsentryuseri{#1}}%
+%}
+%
 % to get rid of the additional "Acronyms" title
-\makeatletter
-\renewcommand{\glossarysection}[2][\@gls@title]{%
-\def\@gls@title{#2}%
-\begin{multicols}{2}%
-\@ifundefined{phantomsection}{%
-\@glossarysection{#1}{#2}}{\@p@glossarysection{#1}{#2}}%
-%\glossarymark{\glossarytoctitle}%
-}
-\makeatother
-\setlength{\columnsep}{1cm}
-\renewcommand*{\glossarypostamble}{\end{multicols}}
-\renewcommand*{\glsclearpage}{\clearpage} % instead of cleardoublepage
+%\makeatletter
+%\renewcommand{\glossarysection}[2][\@gls@title]{%
+%\def\@gls@title{#2}%
+%\begin{multicols}{2}%
+%\@ifundefined{phantomsection}{%
+%\@glossarysection{#1}{#2}}{\@p@glossarysection{#1}{#2}}%
+%}
+%\makeatother
+%\setlength{\columnsep}{1cm}
+%\renewcommand*{\glossarypostamble}{\end{multicols}}
+%\renewcommand*{\glsclearpage}{\clearpage} % instead of cleardoublepage
 
 % customize the acronym printing to include the long form AND the description
-\newglossarystyle{mylist}{%
-  \renewenvironment{theglossary}%
-    {\begin{description}}{\end{description}}%
-  \renewcommand*{\glossaryentryfield}[5]{%
-    \item[\glstarget{##1}{##2}]\glsentryuseri{##1}\space {\footnotesize (pp. ##5)}%
-      \ifthenelse{\equal{\relax ##3}{\relax\glsentryuseri{##1}}}{}{\newline ##3\glspostdescription}%
-  }%
+%\newglossarystyle{mylist}{%
+  %\renewenvironment{theglossary}%
+    %{\begin{description}}{\end{description}}%
+  %\renewcommand*{\glossaryentryfield}[5]{%
+    %\item[\glstarget{##1}{##2}]\glsentryuseri{##1}\space {\footnotesize (pp. ##5)}%
+      %\ifthenelse{\equal{\relax ##3}{\relax\glsentryuseri{##1}}}{}{\newline ##3\glspostdescription}%
+  %}%
   %\renewcommand*{\glossaryheader}{}%
   %\renewcommand*{\glsgroupheading}[1]{}%
   %\renewcommand*{\glossarysubentryfield}[6]{%
     %\par\glstarget{##2}{\strut}##4\glspostdescription\space ##6%
   %}%
   %\renewcommand*{\glsgroupskip}{}%
-}
-\makeglossaries
+%}
+%\makeglossaries
 
-\newcommand{\X}[1]{#1\index{#1}} % shortcut for index
-\newcommand{\Xtt}[1]{\texttt{#1}\index{#1}} % shortcut for index+typewriter fonts... used to index classes and methods
-\makeindex
+%\newcommand{\X}[1]{#1\index{#1}} % shortcut for index
+%\newcommand{\Xtt}[1]{\texttt{#1}\index{#1}} % shortcut for index+typewriter fonts... used to index classes and methods
+%\makeindex
