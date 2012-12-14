@@ -75,14 +75,14 @@ int main (int argc, char *argv[]) {
   ATYPE **matrix = (ATYPE **) malloc(sizeof(ATYPE *) * n);
   if (matrix == NULL) {
     fprintf(stderr, "Out of memory\n");
-    return NULL;
+    return 1;
   }
 
   for (uint i = 0; i < n; i++) {
     matrix[i] = (ATYPE *) malloc(sizeof(ATYPE) * m);
     if (matrix[i] == NULL) {
       fprintf(stderr, "Out of memory\n");
-      return NULL;
+      return 1;
     }
   }
 
