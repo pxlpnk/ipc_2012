@@ -17,6 +17,21 @@ void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, int n, int m, ATYPE *y) {
 }
 
 
+void matrix_vector_mult(ATYPE **x, ATYPE *a, int n, int m, ATYPE *y) {
+  #pragma omp parallel
+  {
+    int rank = omp_get_thread_num();
+    int p = omp_get_num_threads();
+
+    for(int i=rank*n/p; i< (rank + 1)*n/p; i++) {
+      y[i] = 0;
+      for(int j=0; j<m; j++) {
+        y[i] += x[i][j] * a[j];
+      }
+    }
+  }
+}
+
 void matrix_vector_mult_false_sharing(ATYPE **x, ATYPE *a, int n, int m, ATYPE *y) {
   #pragma omp parallel
   {
@@ -36,7 +51,7 @@ void matrix_vector_mult_false_sharing(ATYPE **x, ATYPE *a, int n, int m, ATYPE *
 void print_vector(ATYPE *v, int m) {
   printf("#### VECTOR\n");
   for (int i=0; i<m; i++) {
-    printf("[%d] %ld\n", i, v[i]);
+    printf("[%d] %d\n", i, v[i]);
   }
 }
 
@@ -46,7 +61,7 @@ void print_matrix(ATYPE **matrix, int m, int n) {
   for (int i = 0; i < n; i++) {
     printf("[%d] ", i);
     for (int j = 0; j < m; j++) {
-      printf("%ld ", matrix[i][j]);
+      printf("%d ", matrix[i][j]);
     }
     printf("\n");
   }
@@ -63,13 +78,25 @@ ATYPE sum_vector(ATYPE *v, int n) {
 
 
 int main (int argc, char *argv[]) {
+  int n = 0;
+  int m = 0;
+
+  /* uint nt = (argv[1] != NULL) ? atoi(argv[1]) : 0; // TODO: error handling */
+	/* if (nt > 0) */
+	/* 	omp_set_num_threads(nt); */
+
+  if (argc != 3) {
+    n = 1000;
+    m = 100;
+  } else {
+    n = atoi(argv[1]);
+    m = atoi(argv[2]);
+  }
 
   printf("setting up data structures\n");
   // preparing data structures
 
   // matrix
-  int n = 100000;
-  int m = 10000;
   ATYPE ** matrix;
   ATYPE *vector;
   ATYPE *product;
@@ -104,7 +131,7 @@ int main (int argc, char *argv[]) {
   }
 
   // reference output
-  ref_output = (long *) malloc(sizeof(long) * n);
+  ref_output = (ATYPE *) malloc(sizeof(ATYPE) * n);
   if (ref_output == NULL) {
     fprintf(stderr, "Out of memory\n");
     return 1;
@@ -137,6 +164,21 @@ int main (int argc, char *argv[]) {
   printf("tiling outer loop(false_sharing):\n");
   double time = omp_get_wtime();
   matrix_vector_mult_false_sharing(matrix, vector, n, m, product);
+  time = omp_get_wtime() - time;
+  printf("%lf seconds.\n",time);
+
+
+  free(product);
+  product = (ATYPE *) malloc(sizeof(ATYPE) *n);
+  if(product == NULL) {
+    fprintf(stderr,"Out of memory\n");
+    return 1;
+  }
+
+
+  printf("tiling outer loop propper:\n");
+  time = omp_get_wtime();
+  matrix_vector_mult(matrix, vector, n, m, product);
   time = omp_get_wtime() - time;
   printf("%lf seconds.\n",time);
 
