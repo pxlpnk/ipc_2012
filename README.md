@@ -35,6 +35,12 @@
 *	welche hosts?
 *	wieviele threads?
 *	2D probleme sollen nach n und m geplottet werden
+* Format fuer die Plots:
+  threads: time
+
+  pro testrun und algorithmus ein file.
+
+
 
 ## plot generation
 outputs nach `/data/#-<framework>/p<#>/` (wie /src)
@@ -46,7 +52,7 @@ outputs nach `/data/#-<framework>/p<#>/` (wie /src)
 	whitespace-separated values, `#` comment char, 1. line containing headers followed by the values (also whitespace-separated, line by line).
 
 ###	zeit/instanz-größe
-		
+
 	for each algo-implementation
 		(avg, min, max, med)zeit/instanz-größe
 
@@ -83,4 +89,3 @@ matrix-vector multiply   |                |                 |
 
 * 1-1: "summation can be implemented with a summation variable and a reduction-clause"
 welche summation?
-
