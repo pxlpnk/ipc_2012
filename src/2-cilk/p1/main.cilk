@@ -1,0 +1,22 @@
+/* TUW, October 2012 */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+cilk void hello(int i)
+{
+  printf("hello world from task %d\n",i);  // task identify yourself
+}
+
+cilk int main()
+{
+  int i;
+  // just start some new tasks
+  for (i = 0; i < 100; i++) {
+    spawn hello(i);
+  }
+  
+  sync;
+  
+  return 0;
+}
