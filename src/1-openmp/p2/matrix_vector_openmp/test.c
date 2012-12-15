@@ -40,13 +40,11 @@ int main (int argc, char *argv[]) {
   uint n = 400;
   uint m = 4000;
   uint nt = 3;
-
-
+  uint max_threads = omp_get_max_threads();
 
   printf("setting up data structures\n");
 
   // preparing data structures
-
   ATYPE *vector = NULL;
   ATYPE *product = NULL;
   ATYPE *ref_output = NULL;
@@ -111,10 +109,12 @@ int main (int argc, char *argv[]) {
     printf("tiling outer loop(false_sharing):\n");
     compute_false_sharing(matrix, vector, n, m, product);
 
+#ifdef DEBUG
     if ( !testResult(product, ref_output, n)) {
       printf("=======> Wrong result\n");
       return 1;
     }
+#endif
 
     free(product);
     product = (ATYPE *) malloc(sizeof(ATYPE) *n);
@@ -126,10 +126,14 @@ int main (int argc, char *argv[]) {
     printf("tiling outer loop propper:\n");
     compute_tiling_outer_loop(matrix, vector, n, m, product);
 
+#ifdef DEBUG
+    printf("fffoo");
     if ( !testResult(product, ref_output, n)) {
       printf("=======> Wrong result\n");
       return 1;
     }
+#endif
+
   }
   // cleaning up
   free(vector);
