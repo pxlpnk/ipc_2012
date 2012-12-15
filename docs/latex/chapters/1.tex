@@ -29,12 +29,15 @@
 	string type,
 	multicolumn names, % make siunitx happy
 	columns={size,med,min,avg,max},
+	assign column name/.code={%
+		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
+	},
 	columns/size/.style ={column name={\textstackrel{Instance}{Size}}, column type={S[scientific-notation=false,table-format=9]}, int detect},
 	columns/min/.style ={column name=Minimum,	column type=S},
 	columns/avg/.style ={column name=Average,	column type=S},
 	columns/med/.style ={column name=Median,	column type=S},
 	columns/max/.style ={column name=Maximum,	column type=S},
-	every head row/.style={before row=\toprule, after row=\midrule\endhead},
+	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
 	skip rows between index={1}{2},
 ]{\loadedtable}
@@ -62,7 +65,7 @@
 	\addplot [stack plots=y, fill=red!40, draw opacity=0, area legend]		table [x=size, y expr=\thisrow{max}-\thisrow{med}]	{\loadedtable} \closedcycle;
 \end{axis}
 \end{tikzpicture}
-\caption{Benchmark results showing run time per instance size of the Auxiliary Array algorithm solving the Prefix Sums problem in OpenMP.}
+\caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Auxiliary Array algorithm} solving the \textbf{Prefix Sums problem} in \textbf{OpenMP}.}
 \label{plot:1-1-1-size}
 \end{figure}
 \clearpage
