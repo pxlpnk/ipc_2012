@@ -4,33 +4,30 @@
 #include "matrix_vector_mul.h"
 
 
-uint compute_ref(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *ref_output) {
+double compute_ref(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *ref_output) {
 
   double time = omp_get_wtime();
   matrix_vector_mult_ref(matrix, vector, n, m, ref_output);
 	time = omp_get_wtime() - time;
 
-  printf("%lf seconds.\n", time);
   return time;
 }
 
-uint compute_false_sharing(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
+double compute_false_sharing(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
 
   double time = omp_get_wtime();
   matrix_vector_mult_false_sharing(matrix, vector, n, m, output);
   time = omp_get_wtime() - time;
 
-  printf("%lf seconds.\n",time);
   return time;
 }
 
-uint compute_tiling_outer_loop(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
+double compute_tiling_outer_loop(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
 
   double time = omp_get_wtime();
   matrix_vector_mult(matrix, vector, n, m, output);
   time = omp_get_wtime() - time;
 
-  printf("%lf seconds.\n",time);
   return time;
 }
 
@@ -39,8 +36,9 @@ uint compute_tiling_outer_loop(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATY
 int main (int argc, char *argv[]) {
   uint n = 400;
   uint m = 4000;
-  uint nt = 3;
   uint max_threads = omp_get_max_threads();
+  uint nt = max_threads;
+  double time = 0.0;
 
   printf("setting up data structures\n");
 
@@ -100,14 +98,17 @@ int main (int argc, char *argv[]) {
   printf("Starting computation:\n");
 
   printf("reference:\n");
-  compute_ref(matrix, vector, n, m, ref_output);
+  time = compute_ref(matrix, vector, n, m, ref_output);
+  printf("%lf seconds.\n",time);
+
 
   for(uint i = 1; i<= nt; i++) {
 
     omp_set_num_threads(i);
 
     printf("tiling outer loop(false_sharing):\n");
-    compute_false_sharing(matrix, vector, n, m, product);
+    time = compute_false_sharing(matrix, vector, n, m, product);
+    printf("%lf seconds.\n",time);
 
 #ifdef DEBUG
     if ( !testResult(product, ref_output, n)) {
@@ -124,7 +125,8 @@ int main (int argc, char *argv[]) {
     }
 
     printf("tiling outer loop propper:\n");
-    compute_tiling_outer_loop(matrix, vector, n, m, product);
+    time = compute_tiling_outer_loop(matrix, vector, n, m, product);
+    printf("%lf seconds.\n",time);
 
 #ifdef DEBUG
     printf("fffoo");
