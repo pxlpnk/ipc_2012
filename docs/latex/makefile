@@ -13,16 +13,16 @@ CWD := $(shell pwd)
 TEX_OUT := $(OUTDIR)$(JOB).pdf
 
 
-#all: $(TEX_OUT)
+#all: prereq $(TEX_OUT)
 all: view
 
-fast:
+fast: prereq
 	$(TEX) $(TEX_MAIN).tex
 	"$(VIEW)" "$(CWD)/$(TEX_OUT)"
 
-view: $(TEX_OUT) 
+view: prereq $(TEX_OUT)
 	"$(VIEW)" "$(CWD)/$(TEX_OUT)"
-	
+
 clean:
 	rm -rf $(OUTDIR)*.aux $(OUTDIR)*.bbl $(OUTDIR)*.idx $(OUTDIR)*.ilg $(OUTDIR)*.lot $(OUTDIR)*.blg $(OUTDIR)*.alg $(OUTDIR)*.ind $(OUTDIR)*.toc $(OUTDIR)*.acl $(OUTDIR)*.acn $(OUTDIR)*.acr $(OUTDIR)*.out $(OUTDIR)*.log $(OUTDIR)*.gls $(OUTDIR)*.glo $(OUTDIR)*.glg $(OUTDIR)*.ist $(OUTDIR)*.brf $(OUTDIR)images/*pdf $(TEX_OUT)
 
@@ -35,4 +35,7 @@ $(TEX_OUT): *.tex chapters/*tex *.bib
 	#$(ACR) $(OUTDIR)$(JOB)
 	$(TEX) $(TEX_MAIN)
 
-.PHONY = clean view all fast
+prereq:
+	@mkdir $(OUTDIR) 2>/dev/null || true
+
+.PHONY = clean view all fast prereq
