@@ -95,6 +95,13 @@ def prepare_data( files )
   @hash
 end
 
+def header(field="id")
+  "#{field},min,max,avg,med"
+end
+
+def get_elem(elem, data)
+   [elem, data[:min][elem], data[:max][elem], data[:mean][elem], data[:median][elem]]
+end
 
 if __FILE__ == $0
   require 'csv'
@@ -119,5 +126,7 @@ if __FILE__ == $0
   end
 
   p output
+  puts header
+  puts get_elem(0+1, output).to_csv
 
 end
