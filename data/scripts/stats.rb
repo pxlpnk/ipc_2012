@@ -67,17 +67,6 @@ module Enumerable
 end
 
 
-
-
-def aggregate(data, fn)
-  computed = []
-  data.each do |k,dat|
-    computed << dat.send(fn)
-  end
-  computed
-end
-
-
 def usage
   "usage: ./stats.rb <list of files>"
 end
@@ -95,6 +84,17 @@ def prepare_data( files )
   @hash
 end
 
+
+def aggregate(data, fn)
+  computed = []
+  data.each do |k,dat|
+    computed[k] = dat.send(fn)
+  end
+
+  computed
+end
+
+
 def header(field="id")
   "#{field},min,max,avg,med"
 end
@@ -103,11 +103,20 @@ def get_elem(elem, data)
    [elem, data[:min][elem], data[:max][elem], data[:mean][elem], data[:median][elem]]
 end
 
+def compute_indices(data)
+    computed = []
+  data.each do |k,dat|
+    computed << k
+  end
+
+  computed
+end
+
 if __FILE__ == $0
   require 'csv'
 
   @files = []
-  ARGV.each do|arg|
+  ARGV.each do |arg|
     @files << arg if File.exists?(arg)
   end
 
@@ -117,6 +126,7 @@ if __FILE__ == $0
   end
 
   data = prepare_data(@files)
+  indices = compute_indices(data)
 
   functions = [:max, :min, :mean, :median]
   output = {}
@@ -125,8 +135,9 @@ if __FILE__ == $0
     output[fn] = aggregate(data, fn)
   end
 
-  p output
   puts header
-  puts get_elem(0+1, output).to_csv
+  indices.each do |index|
+    puts get_elem(index, output).to_csv
+  end
 
 end
