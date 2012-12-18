@@ -1,9 +1,17 @@
 #include <stdint.h>
-#include <stdbool.h>
 #include <stdlib.h>
+
+#ifndef __CILK__
+	#include <stdbool.h>
+#else
+	#define bool int
+	#define true 1
+	#define false 0
+#endif
 
 typedef unsigned int uint;
 #define odd(x) (((x) % 2) == 1)
+
 
 /* returns random value v \elem [min, max]. see http://c-faq.com/lib/randrange.html */
 uint randRange(uint min, uint max);

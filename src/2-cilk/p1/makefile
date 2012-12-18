@@ -7,6 +7,8 @@ P := $(shell dirname $(CWD))
 EXE ?= $(shell basename $(P))-$(shell basename $(CWD)).exe
 CFLAGS ?= -Wall -DATYPE=$(ATYPE) -DATYPEPRINT=$(ATYPEPRINT)
 CILKFLAGS ?= -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=200809L
+HDRS := \
+	$(wildcard ../../shared/*.h)
 SRCS := \
 	$(wildcard ../../../shared/*.c) \
 	$(wildcard *.c) 
@@ -15,7 +17,7 @@ CILKDSRCS := \
 
 all: $(EXE)
 
-%.exe:
+%.exe: $(CILKDSRCS) $(SRCS) $(HDRS)
 	cilkc $(CFLAGS) $(CILKFLAGS) $(CILKDSRCS) $(SRCS) -o $@
 
 clean:
