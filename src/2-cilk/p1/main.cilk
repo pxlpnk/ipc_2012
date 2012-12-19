@@ -1,22 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cilk-lib.cilkh"
+#include "cilk.h"
 #include "../../shared/util.h"
+
+void EXPORT(cilk_hello) (CilkContext *const ctx, uint t);
 
 cilk void hello(int i) {
 	printf("hello world from task %d\n", i);
 }
 
-cilk int main() {
-	Cilk_time time = Cilk_get_wall_time();
-	// just start some new tasks
+cilk void cilk_hello(uint n) {
 	uint i;
-	for (i = 0; i < 100; i++) {
+	for (i = 0; i < n; i++) {
 		spawn hello(i);
 	}
 	sync;
-	time = Cilk_get_wall_time() - time;
-	printf("%f s elapsed\n", Cilk_wall_time_to_sec(time));
+}
 
+int main(int argc, char *argv[]) {
+	Cilk_time time; // oh cilk i hate you so much. try narrowing its scope to see why.
+	uint n = 100;
+	CilkContext* ctx = Cilk_init (&argc, argv);
+	if(ctx == NULL)
+		return 1;
+
+	time = Cilk_get_wall_time();
+	EXPORT(cilk_hello) (ctx, n);
+	time = Cilk_get_wall_time() - time;
+
+	Cilk_terminate (ctx);
+	printf("%f s elapsed\n", Cilk_wall_time_to_sec(time));
 	return 0;
 }
