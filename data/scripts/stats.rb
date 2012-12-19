@@ -4,6 +4,13 @@
 # Copyright 2011 Trey Kinkead
 #
 
+
+
+class Array
+  def to_csv
+  "#{self.join(",")}\n"
+  end
+end
 module Enumerable
 
   def mean
