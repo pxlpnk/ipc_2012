@@ -1,13 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include "cilk-lib.cilkh"
 #include "cilk.h"
 #include "../../shared/util.h"
 
 void EXPORT(cilk_hello) (CilkContext *const ctx, uint t);
 
+void usage_abort(void) {
+	fprintf(stderr, "Aborting…\n");
+	exit(EXIT_FAILURE);
+}
+
 cilk void hello(int i) {
-	printf("hello world from task %d\n", i);
+	printf("hello world #%d from task %d\n", i, Self);
 }
 
 cilk void cilk_hello(uint n) {
@@ -15,21 +21,50 @@ cilk void cilk_hello(uint n) {
 	for (i = 0; i < n; i++) {
 		spawn hello(i);
 	}
-	sync;
 }
 
 int main(int argc, char *argv[]) {
 	Cilk_time time; // oh cilk i hate you so much. try narrowing its scope to see why.
-	uint n = 100;
-	CilkContext* ctx = Cilk_init (&argc, argv);
+	CilkContext* ctx;
+	char opt;
+	int option_index;
+	uint t = 0;
+	static const char optstring[] = "n:t:";
+	static const struct option long_options[] = {
+		{"nproc",		1, NULL, 't'},
+		{NULL,			0, NULL, 0},
+	};
+
+	while ((opt = getopt_long(argc, argv, optstring, long_options, &option_index)) != EOF) {
+		switch (opt) {
+		case 't':
+			t = atoi(optarg); // TODO: error handling
+			break;
+		default:
+			usage_abort();
+			break;
+		}
+	}
+
+	if (optind < argc) {
+		fprintf(stderr, "Warning: Extra parameters found.\n");
+		//usage_abort();
+	}
+
+	if (t == 0){
+		fprintf(stderr, "Number of threads required!\n");
+		usage_abort();
+	}
+
+	ctx = Cilk_init(&argc, argv);
 	if(ctx == NULL)
-		return 1;
+		return EXIT_FAILURE;
 
 	time = Cilk_get_wall_time();
-	EXPORT(cilk_hello) (ctx, n);
+	EXPORT(cilk_hello) (ctx, t);
 	time = Cilk_get_wall_time() - time;
 
 	Cilk_terminate (ctx);
-	printf("%f s elapsed\n", Cilk_wall_time_to_sec(time));
+	printf("%f s elapsed in %d threads.\n", Cilk_wall_time_to_sec(time), t);
 	return 0;
 }
