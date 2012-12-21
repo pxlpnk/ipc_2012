@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef unsigned int uint;
 #define odd(x) (((x) % 2) == 1)
@@ -31,3 +32,9 @@ ATYPE **fillMatrix(ATYPE **matrix, uint m, uint n);
 
 /* tests if two vectors are equal */
 bool testResult(ATYPE *vector, ATYPE *reference, uint n);
+
+/* returns the minimum of two integers */
+int min(uint x, uint y);
+
+/*returns the current time as time stamp */
+char *time_stamp();
