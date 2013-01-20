@@ -116,7 +116,7 @@ def compute_indices(data)
     computed << k
   end
 
-  computed
+  computed.sort
 end
 
 if __FILE__ == $0
