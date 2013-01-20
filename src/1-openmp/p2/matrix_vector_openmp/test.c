@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <omp.h>
+
+
 #include "matrix_vector_mul.h"
 
 
@@ -38,7 +40,7 @@ int main (int argc, char *argv[]) {
   uint m = 4000;
   uint max_threads = omp_get_max_threads();
   uint nt = max_threads;
-  double time = 0.0;
+  double mtime = 0.0;
 
   printf("setting up data structures\n");
 
@@ -46,6 +48,14 @@ int main (int argc, char *argv[]) {
   ATYPE *vector = NULL;
   ATYPE *product = NULL;
   ATYPE *ref_output = NULL;
+
+  char *timestamp = time_stamp();
+
+  // file handles
+
+  FILE *false_sharing, *tiling;
+  char *mode = "w+";
+
 
   // matrix
 
@@ -98,8 +108,8 @@ int main (int argc, char *argv[]) {
   printf("Starting computation:\n");
 
   printf("reference:\n");
-  time = compute_ref(matrix, vector, n, m, ref_output);
-  printf("%lf seconds.\n",time);
+  mtime = compute_ref(matrix, vector, n, m, ref_output);
+  printf("%lf seconds.\n",mtime);
 
 
   for(uint i = 1; i<= nt; i++) {
@@ -107,8 +117,8 @@ int main (int argc, char *argv[]) {
     omp_set_num_threads(i);
 
     printf("tiling outer loop(false_sharing):\n");
-    time = compute_false_sharing(matrix, vector, n, m, product);
-    printf("%lf seconds.\n",time);
+    mtime = compute_false_sharing(matrix, vector, n, m, product);
+    printf("%lf seconds.\n",mtime);
 
 #ifdef DEBUG
     if ( !testResult(product, ref_output, n)) {
@@ -125,11 +135,10 @@ int main (int argc, char *argv[]) {
     }
 
     printf("tiling outer loop propper:\n");
-    time = compute_tiling_outer_loop(matrix, vector, n, m, product);
-    printf("%lf seconds.\n",time);
+    mtime = compute_tiling_outer_loop(matrix, vector, n, m, product);
+    printf("%lf seconds.\n",mtime);
 
 #ifdef DEBUG
-    printf("fffoo");
     if ( !testResult(product, ref_output, n)) {
       printf("=======> Wrong result\n");
       return 1;
