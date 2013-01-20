@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifndef __CILK__
 	#include <stdbool.h>
@@ -39,3 +40,9 @@ ATYPE **fillMatrix(ATYPE **matrix, uint m, uint n);
 
 /* tests if two vectors are equal */
 bool testResult(ATYPE *vector, ATYPE *reference, uint n);
+
+/* returns the minimum of two integers */
+int min(uint x, uint y);
+
+/*returns the current time as time stamp */
+char *time_stamp();

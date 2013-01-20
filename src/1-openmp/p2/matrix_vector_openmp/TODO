@@ -1,0 +1,6 @@
+* write data to logfiles
+* Try to establish best and worst case. Show results as functions of n and m.
+* Experiment with placement of threads in the 48-core system for the best and worst-case loops
+* Plot time as function of problem size, fixed number of threads
+* Plot time or speedup as function of number of threads/cores, fixed problem size (but for different sizes)
+* Documentation

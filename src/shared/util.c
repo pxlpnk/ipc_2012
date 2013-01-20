@@ -81,3 +81,18 @@ bool testResult(ATYPE *vector, ATYPE *reference, uint n) {
   }
   return true;
 }
+
+
+int min(uint x, uint y) {
+    return (x < y) ? x : y;
+}
+
+
+char *time_stamp() {
+  time_t now = time(NULL);
+  struct tm tim;
+  tim = *(localtime(&now));
+  static char timestamp[12];
+  strftime(timestamp, 13, "%Y%m%d-%H%M", &tim);
+  return timestamp;
+}
