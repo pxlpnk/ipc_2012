@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <omp.h>
+#include <string.h>
+
 
 
 #include "matrix_vector_mul.h"
@@ -53,7 +55,7 @@ int main (int argc, char *argv[]) {
 
   // file handles
 
-  FILE *false_sharing, *tiling;
+  FILE *false_sharing, *tiling, *reference;
   char *mode = "w+";
 
 
@@ -107,9 +109,30 @@ int main (int argc, char *argv[]) {
 
   printf("Starting computation:\n");
 
+  char reference_filename[50];
+  strcpy(reference_filename, "data/reference_");
+  strcat(reference_filename, timestamp) ;
+
+  reference = fopen(reference_filename,"a+");
+
+  char fs_filename[50];
+  strcpy(fs_filename, "data/false_sharing_");
+  strcat(fs_filename, timestamp) ;
+
+  false_sharing = fopen(fs_filename,"a+");
+
+  char tiling_filename[50];
+  strcpy(tiling_filename, "data/tiling_");
+  strcat(tiling_filename, timestamp) ;
+
+  tiling = fopen(tiling_filename,"a+");
+
   printf("reference:\n");
   mtime = compute_ref(matrix, vector, n, m, ref_output);
   printf("%lf seconds.\n",mtime);
+
+  fprintf(reference,"%d,%lf\n",1,mtime);
+
 
 
   for(uint i = 1; i<= nt; i++) {
@@ -119,6 +142,9 @@ int main (int argc, char *argv[]) {
     printf("tiling outer loop(false_sharing):\n");
     mtime = compute_false_sharing(matrix, vector, n, m, product);
     printf("%lf seconds.\n",mtime);
+
+    fprintf(false_sharing,"%d,%lf\n",i,mtime);
+
 
 #ifdef DEBUG
     if ( !testResult(product, ref_output, n)) {
@@ -138,6 +164,8 @@ int main (int argc, char *argv[]) {
     mtime = compute_tiling_outer_loop(matrix, vector, n, m, product);
     printf("%lf seconds.\n",mtime);
 
+    fprintf(tiling,"%d,%lf\n",i,mtime);
+
 #ifdef DEBUG
     if ( !testResult(product, ref_output, n)) {
       printf("=======> Wrong result\n");
@@ -155,5 +183,7 @@ int main (int argc, char *argv[]) {
   free(matrix);
   free(ref_output);
   free(product);
+  fclose(false_sharing);
+  fclose(tiling);
 
 }
