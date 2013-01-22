@@ -10,8 +10,9 @@ CILKFLAGS ?= -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=200809L
 HDRS := \
 	$(wildcard ../../shared/*.h)
 SRCS := \
-	$(wildcard ../../../shared/*.c) \
-	$(wildcard *.c) 
+	$(wildcard ../../shared/*.c) \
+	$(wildcard *.c)
+OBJS = $(SRCS:%.c=%.o)
 CILKDSRCS := \
 	$(wildcard *.cilk)
 
@@ -21,6 +22,6 @@ all: $(EXE)
 	cilkc $(CFLAGS) $(CILKFLAGS) $(CILKDSRCS) $(SRCS) -o $@
 
 clean:
-	rm -rf $(EXE)
+	rm -rf $(EXE) $(OBJS)
 
 .PHONY = clean all
