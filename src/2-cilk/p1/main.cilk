@@ -24,7 +24,7 @@ cilk void cilk_hello(uint n) {
 }
 
 int main(int argc, char *argv[]) {
-	Cilk_time time; // oh cilk i hate you so much. try narrowing its scope to see why.
+	Cilk_time timestamp; // oh cilk i hate you so much. try narrowing its scope to see why.
 	CilkContext* ctx;
 	char opt;
 	int option_index;
@@ -60,11 +60,11 @@ int main(int argc, char *argv[]) {
 	if(ctx == NULL)
 		return EXIT_FAILURE;
 
-	time = Cilk_get_wall_time();
+	timestamp = Cilk_get_wall_time();
 	EXPORT(cilk_hello) (ctx, t);
-	time = Cilk_get_wall_time() - time;
+	timestamp = Cilk_get_wall_time() - timestamp;
 
 	Cilk_terminate (ctx);
-	printf("%f s elapsed in %d threads.\n", Cilk_wall_time_to_sec(time), t);
+	printf("%f s elapsed in %d threads.\n", Cilk_wall_time_to_sec(timestamp), t);
 	return 0;
 }
