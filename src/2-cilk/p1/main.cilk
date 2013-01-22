@@ -6,7 +6,9 @@
 #include "cilk.h"
 #include "../../shared/util.h"
 
-void EXPORT(datapara) (CilkContext *const ctx, uint i, uint j, ATYPE a[], uint unit);
+#define MIN_OPS_PER_THREAD 1
+
+void EXPORT(datapara) (CilkContext *const ctx, ATYPE a[], uint n, uint t);
 void EXPORT(rec) (CilkContext *const ctx, ATYPE *a[], uint n);
 
 void usage_abort(void) {
@@ -14,26 +16,112 @@ void usage_abort(void) {
 	exit(EXIT_FAILURE);
 }
 
-cilk void datapara(uint i, uint j, ATYPE a[], uint unit) {
-	if (j-i <= unit) {
-		uint k;
-		for (k = i; k < j; k++)
-			a[k] += a[k-1];
-	} else {
-		spawn datapara(i, j/2, a, unit);
-		spawn datapara(j/2+1, j, a,unit);
-		sync;
+cilk void inplace_double(ATYPE arr[], uint n, uint k) {
+	uint i;
+	uint kk = k<<1;
+	printf("inplace_double: %d..%d in steps of %d\n", kk-1, n, kk);
+	if (n < kk-1) {
+		printf("n<kk-1!\n");
+		return;
+	}
+	for (i = kk-1; i < n; i += kk) {
+		printf("%d: %p += %p\n", i, arr+i, arr+i-k);
+		arr[i] += arr[i-k];
 	}
 }
 
-cilk void reduce_rec(ATYPE a[], uint n) {
+cilk void inplace_halve(ATYPE arr[], uint cnt, uint k) {
+	uint kk = k/2;
+	uint i;
+	for (i = 0; i < cnt*k; i += k) {//
+		printf("%i: %p += %p\n", i, arr+i+kk, arr+i);
+		arr[i+kk] += arr[i];
+	}
+}
+
+cilk void datapara(ATYPE arr[], uint n, uint t) {
+	uint k, kk, i;
+	for (k = 1; k < n; k = kk) {
+		uint start, units, end;
+		uint ratio;
+		kk = k<<1; // double
+		start = kk-1;
+		end = n;
+		units = n/kk;
+		ratio = units/t;
+		printf("double: n=%d, k=%d, start=%d, end=%d, step=%d, units=%d, ratio=%d\n", n, k, start, end, kk, units, ratio);
+		if (ratio < MIN_OPS_PER_THREAD) {
+			for (i = kk-1; i < n; i += kk) {
+				printf("%d: %p += %p\n", i, arr+i, arr+i-k);
+				arr[i] += arr[i-k];
+			}
+		} else {
+			i = 0;
+			if (ratio > 0) {
+				for (; i < units-ratio; i += ratio) {
+					printf("%d: spawn %d starting at %d\n", i, ratio, kk-1 + i*kk);
+					spawn inplace_double(arr + i*kk, ratio*kk, k);
+				}
+			}
+			if (i < units) { // i == 0
+				printf("%d+: spawn %d starting at %d\n", i, (units - i), kk-1 + i*kk);
+				spawn inplace_double(arr + i*kk, (units - i)*kk, k);
+			}
+			sync;
+		}
+	}
+
+	for (k = k>>1; k > 1; k = kk) {
+		uint start,  ratio, end;
+		uint units, diff;
+		kk = k>>1; // halve
+
+		start = k-1;
+		end = n-kk;
+		units = (end-start)/k;
+		diff = (end-start) - (units * k);
+		ratio = units/t;
+		printf("halve: n=%d, k=%d, start=%d, end=%d, step=%d, units=%d, ratio=%d\n", n, k, start, end, k, units, ratio);
+		if (ratio < MIN_OPS_PER_THREAD) {
+			for (i = k-1; i < n-kk; i += k) {
+				printf("%d: %p += %p\n", i+kk, arr+i+kk, arr+i);
+				arr[i+kk] = arr[i] + arr[i+kk];
+			}
+		} else {
+			i = 0;
+			if (end > start) {
+				if (ratio > 0) {
+					for (; i < units-ratio; i += ratio) {
+						printf("%d: spawn %d starting at %d\n", i, ratio, k-1 + kk + i*k);
+						spawn inplace_halve(arr + i*k + k-1, ratio, k);
+					}
+				}
+				if (i < units) {
+					printf("%d+: spawn %d starting at %d\n", i, (units - i), k-1 + kk + i*k);
+					spawn inplace_halve(arr + i*k + k-1, (units - i), k);
+					i++;
+				}
+				sync;
+				if (diff != 0) {
+					printf("units not exact! diff = %d. starting at %d\n", diff, end-diff+kk);
+					for (i = end - diff; i < end; i += k) {
+						printf("%d: %p += %p\n", i+kk, arr+i+kk, arr+i);
+						arr[i+kk] = arr[i] + arr[i+kk];
+					}
+				}
+			}
+		}
+	}
+}
+
+cilk void reduce_rec(ATYPE arr[], uint n) {
 	if (n > 3) {
-		spawn reduce_rec(a + 0, n/2);
-		spawn reduce_rec(a + n/2, n - n/2);
+		spawn reduce_rec(arr + 0, n/2);
+		spawn reduce_rec(arr + n/2, n - n/2);
 		sync;
-		a[n-1] += a[n/2-1];
+		arr[n-1] += arr[n/2-1];
 	} else if (n > 1) { // n = 2 or 3. 2: we add up, 3: we add up and leave the odd one in place
-		a[1] = a[0] + a[1];
+		arr[1] = arr[0] + arr[1];
 	} else if (n == 1)
 		; // nothing todo
 }
@@ -140,8 +228,7 @@ int main(int argc, char *argv[]) {
 
 	timestamp = Cilk_get_wall_time();
 	if (algo == data) {
-		printf("unit = n/t = %d\n", n/t);
-		EXPORT(datapara)(ctx, 0, n, arr, n/t);
+		EXPORT(datapara)(ctx, arr, n, t);
 	} else
 		EXPORT(rec)(ctx, &arr, n);
 	timestamp = Cilk_get_wall_time() - timestamp;
