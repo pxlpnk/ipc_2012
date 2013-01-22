@@ -10,6 +10,11 @@
 	#define false 0
 #endif
 
+#ifndef DBG
+#undef printf
+#define printf(...)
+#endif
+
 typedef unsigned int uint;
 #define odd(x) (((x) % 2) == 1)
 
