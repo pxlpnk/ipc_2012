@@ -107,7 +107,9 @@ int main (int argc, char *argv[]) {
     vector[i]=i+m;
   }
 
-  printf("Starting computation:\n");
+
+  printf("\nStarting computation: %s \n",timestamp);
+
 
   char reference_filename[50];
   strcpy(reference_filename, "data/reference_");
@@ -136,6 +138,7 @@ int main (int argc, char *argv[]) {
 
 
   for(uint i = 1; i<= nt; i++) {
+    printf("No of cpus: %d\n", i);
 
     omp_set_num_threads(i);
 
