@@ -7,7 +7,8 @@ uint randRange(uint min, uint max) {
 
 void shuffleArr(ATYPE *arr, uint n) {
 	ATYPE tmp;
-	for (uint i = 0; i < n; i++) {
+	uint i;
+	for (i = 0; i < n; i++) {
 		tmp = arr[i];
 		uint j = randRange(0, n-1);
 		arr[i] = arr[j];
@@ -16,7 +17,8 @@ void shuffleArr(ATYPE *arr, uint n) {
 }
 
 ATYPE *fillArr(ATYPE *arr, uint n) {
-	for (uint i = 0; i < n; i++)
+	uint i;
+	for (i = 0; i < n; i++)
 		arr[i] = i;
 	return arr;
 }
@@ -24,7 +26,8 @@ ATYPE *fillArr(ATYPE *arr, uint n) {
 uint prefixSums(ATYPE *arr, uint n, bool exclusive, ATYPE * sums) {
 	uint sum = arr[0];
 	sums[0] = 0; // undefined
-	for (uint i = 1; i < n; i++) {
+	uint i;
+	for (i = 1; i < n; i++) {
 		if (exclusive) {
 			sums[i] = sum;
 			sum += arr[i];
@@ -37,14 +40,16 @@ uint prefixSums(ATYPE *arr, uint n, bool exclusive, ATYPE * sums) {
 }
 
 void printArray(ATYPE *a, uint n) {
-	for (uint i = 0; i < n; i++) {
+	uint i;
+	for (i = 0; i < n; i++) {
 		printf("[%03d]:\t%" ATYPEPRINT "\n", i, a[i]);
 	}
 	printf("\n");
 }
 
 void printArrs(ATYPE *a, ATYPE *b, uint n) {
-	for (uint i = 0; i < n; i++) {
+	uint i;
+	for (i = 0; i < n; i++) {
 		printf("[%03d]:\t%" ATYPEPRINT, i, a[i]);
 		printf("\t%s    ", (a[i] != b[i]) ? "!=    " : "      ");
 		printf("%" ATYPEPRINT "\n", b[i]);
@@ -55,9 +60,11 @@ void printArrs(ATYPE *a, ATYPE *b, uint n) {
 
 void print_matrix(ATYPE **matrix, uint m, uint n) {
   printf("#### MATRIX\n");
-  for (uint i = 0; i < n; i++) {
+  uint i;
+  for (i = 0; i < n; i++) {
     printf("[%d] ", i);
-    for (uint j = 0; j < m; j++) {
+    uint j;
+    for (j = 0; j < m; j++) {
       printf("%d ", matrix[i][j]);
     }
     printf("\n");
@@ -65,17 +72,19 @@ void print_matrix(ATYPE **matrix, uint m, uint n) {
 }
 
 ATYPE **fillMatrix(ATYPE **matrix, uint n, uint m) {
-  for (uint i=0; i<n; i++) {
-    for (uint j=0; j<m; j++) {
+  uint i;
+  for (i=0; i<n; i++) {
+    uint j;
+    for (j=0; j<m; j++) {
       matrix[i][j] = ((j*i) % 42) + m;
     }
   }
   return matrix;
 }
 
-
 bool testResult(ATYPE *vector, ATYPE *reference, uint n) {
-  for(uint i = 1; i<n; i++) {
+  uint i;
+  for(i = 1; i<n; i++) {
     if (vector[i] != reference[i])
       return false;
   }
