@@ -61,10 +61,11 @@ void printArray(ATYPE *a, uint n) {
 
 void printArrs(ATYPE *a, ATYPE *b, uint n) {
 	uint i;
+	printf("arrays at %p and %p\n", a, b);
 	for (i = 0; i < n; i++) {
-		printf("[%03d]:\t%" ATYPEPRINT, i, a[i]);
+		printf("[%03d]:\t%p@  %" ATYPEPRINT, i, a+i, a[i]);
 		printf("\t%s    ", (a[i] != b[i]) ? "!=    " : "      ");
-		printf("%" ATYPEPRINT "\n", b[i]);
+		printf("%" ATYPEPRINT "  @%p\n", b[i], b+i);
 	}
 	printf("\n");
 }
