@@ -171,6 +171,7 @@ int main(int argc, char *argv[]) {
 		{"nproc",		1, NULL, 't'},
 		{NULL,			0, NULL, 0},
 	};
+	int ret = 0;
 
 	while ((opt = getopt_long(argc, argv, optstring, long_options, &option_index)) != EOF) {
 		switch (opt) {
@@ -237,11 +238,12 @@ int main(int argc, char *argv[]) {
 	if (n < 100)
 		printArrs(cor, arr, n);
 
-	printf("Correct? %s\n", memcmp(cor, arr, sizeof(ATYPE) * n) == 0 ? "yes" : "no");
+	ret = memcmp(cor, arr, sizeof(ATYPE) * n);
+	printf("Correct? %s\n", ret == 0 ? "yes" : "no");
 	printf("%f s elapsed in %d threads.\n", Cilk_wall_time_to_sec(timestamp), t);
 
 	free(cor);
 	free(arr);
 
-	return 0;
+	return ret;
 }
