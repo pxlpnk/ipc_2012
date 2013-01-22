@@ -13,6 +13,7 @@
 typedef unsigned int uint;
 #define odd(x) (((x) % 2) == 1)
 
+uint roundUpPowerOf2(uint v);
 
 /* returns random value v \elem [min, max]. see http://c-faq.com/lib/randrange.html */
 uint randRange(uint min, uint max);
