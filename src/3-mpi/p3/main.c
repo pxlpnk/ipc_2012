@@ -99,11 +99,6 @@ int main(int argc, char** argv) {
   }
 
 
-  for(int i=0; i<N; i++) {
-    sendbuff[i] = sendbuff[i] + vector[i]*2;
-  }
-
-
 
   for (int i=0; i<N; i++){
     sendbuff[i] = 0;
