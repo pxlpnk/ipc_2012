@@ -8,7 +8,19 @@
 #include "main.h"
 #include "allgather.h"
 
-#define N 2000
+#define N 10
+
+
+void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y) {
+  for(uint i=0; i<n; i++) {
+    y[i]=0;
+    for(uint j=0; j<m; j++) {
+        y[i] += x[i][j] * a[j];
+    }
+  }
+}
+
+
 
 
 int main(int argc, char** argv) {
@@ -18,7 +30,7 @@ int main(int argc, char** argv) {
   int nlen;
 
   int	buffsize;
-  double sendbuff[N], recvbuff[N],buffsum;
+  uint sendbuff[N], recvbuff[N],buffsum;
 
   /* ======================================================== */
   /* Initialisation matrix & vector */
@@ -51,6 +63,19 @@ int main(int argc, char** argv) {
 
   vector = fillArr(vector, N);
   //  printArray(vector, N);
+
+  ATYPE *reference = NULL;
+  reference = (ATYPE *) malloc(sizeof(ATYPE) * N);
+  if (reference == NULL) {
+    fprintf(stderr,"Out of memory\n");
+    return 1;
+  }
+
+
+  debug("Comptuting reference");
+
+  matrix_vector_mult_ref(matrix, vector, N , N, reference);
+
 
 
   MPI_Init(&argc,&argv);
@@ -90,13 +115,29 @@ int main(int argc, char** argv) {
 
   debug("MPI_Allgather");
 
-  MPI_Allgather(&sendbuff, buffsize, MPI_DOUBLE,
-                &recvbuff, buffsize, MPI_DOUBLE,
+  MPI_Allgather(&sendbuff, buffsize, MPI_INT,
+                &recvbuff, buffsize, MPI_INT,
                 MPI_COMM_WORLD);
 
 
   for(int i=0; i<N; i++) {
-    printf("%f ",recvbuff[i]);
+    printf("%d ",recvbuff[i]);
+  }
+
+
+  /* for(int i=0; i<N; i++) { */
+  /*   printf("%d ",reference[i]); */
+  /* } */
+
+
+
+  debug("Testing result");
+
+
+  if (testResult(recvbuff, reference, N)) {
+    debug("testresult: OK");
+  } else {
+    debug("testresult: FAILURE");
   }
 
 
