@@ -1,0 +1,6 @@
+
+
+void mpi_allgather() {
+
+
+}

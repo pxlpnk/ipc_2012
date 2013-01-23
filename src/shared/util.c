@@ -96,3 +96,11 @@ char *time_stamp() {
   strftime(timestamp, 14, "%Y%m%d-%H%M", &tim);
   return timestamp;
 }
+
+
+
+void debug (char *msg){
+#ifdef DEBUG
+  printf("=> %s\n", msg);
+#endif
+}
