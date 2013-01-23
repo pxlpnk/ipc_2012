@@ -8,7 +8,7 @@
 #include "main.h"
 #include "allgather.h"
 
-#define N 8
+#define N 10000
 
 
 void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y) {
@@ -20,6 +20,14 @@ void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y) {
   }
 }
 
+
+bool test_vector_part(ATYPE *vector, ATYPE *reference, uint n, uint offset) {
+  for(uint i = offset; i<n; i++) {
+    if (vector[i] != reference[i])
+      return false;
+  }
+  return true;
+}
 
 
 
@@ -98,7 +106,6 @@ int main(int argc, char** argv) {
     recvbuff[i] = vector[i];
   }
 
-
   int partition = N/size;
 
   printf("Rank: %d\n", rank);
@@ -106,15 +113,7 @@ int main(int argc, char** argv) {
   printf("partition: %d\n", partition);
 
 
-
-  /* for(int i= (rank * partition); i < ((rank + 1 ) * partition) ; i++) { */
-  /*   sendbuff[i] = 0; */
-  /*   for (int k=0; k<N; k++) { */
-  /*     sendbuff[i] = sendbuff[i] + matrix[i][k] * vector[k]; */
-  /*   } */
-  /* } */
-
-  for (int i=0; i<N; i++){
+  for(int i= (rank * partition); i < ((rank + 1 ) * partition) ; i++) {
     sendbuff[i] = 0;
     for (int k=0; k<N; k++) {
       sendbuff[i] = sendbuff[i] + matrix[i][k] * vector[k];
@@ -137,23 +136,18 @@ int main(int argc, char** argv) {
   debug("after MPI_Allgather");
 
 
-  for(int i = 0; i < size  ; i += partition) {
-    for(int j = 0; j < 2 * partition; j++) {
-      printf("%d:%d:%d\n",i,j,recvbuff[j]);
-      result[i+j] = recvbuff[j];
-    }
-  }
-
   debug("Testing result");
-  if (testResult(result, reference, N)) {
+  if (test_vector_part(result, recvbuff, (rank * partition) , partition)) {
     debug("testresult: OK");
   } else {
     debug("testresult: FAILURE");
     debug("Result:");
-    printArray(result,N);
+    printArray(recvbuff, N);
     debug("Reference:");
     printArray(reference,N);
   }
+
+  MPI_Barrier(MPI_COMM_WORLD);
 
   if(rank == 0) {
     printf("=> time used:");
