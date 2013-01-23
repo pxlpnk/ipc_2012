@@ -113,12 +113,18 @@ int main(int argc, char** argv) {
   }
 
 
+
+  double       inittime,totaltime;
+
   debug("MPI_Allgather");
+
+  inittime = MPI_Wtime();
 
   MPI_Allgather(&sendbuff, buffsize, MPI_INT,
                 &recvbuff, buffsize, MPI_INT,
                 MPI_COMM_WORLD);
 
+  totaltime = MPI_Wtime() - inittime;
 
   for(int i=0; i<N; i++) {
     printf("%d ",recvbuff[i]);
