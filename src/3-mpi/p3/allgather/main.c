@@ -4,7 +4,7 @@
 // MPI header
 #include <mpi.h>
 
-#include "../../shared/util.h"
+#include "../../../shared/util.h"
 #include "main.h"
 #include "allgather.h"
 
