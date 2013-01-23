@@ -8,7 +8,7 @@
 #include "main.h"
 #include "allgather.h"
 
-#define N 10000
+#define N 8
 
 
 void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y) {
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
   int nlen;
 
   int	buffsize;
-  uint sendbuff[N], recvbuff[N],buffsum;
+  uint sendbuff[N], recvbuff[N], result[N];
 
   /* ======================================================== */
   /* Initialisation matrix & vector */
@@ -99,6 +99,20 @@ int main(int argc, char** argv) {
   }
 
 
+  int partition = N/size;
+
+  printf("Rank: %d\n", rank);
+  printf("size/rank: %d\n", (size/(rank+1)));
+  printf("partition: %d\n", partition);
+
+
+
+  /* for(int i= (rank * partition); i < ((rank + 1 ) * partition) ; i++) { */
+  /*   sendbuff[i] = 0; */
+  /*   for (int k=0; k<N; k++) { */
+  /*     sendbuff[i] = sendbuff[i] + matrix[i][k] * vector[k]; */
+  /*   } */
+  /* } */
 
   for (int i=0; i<N; i++){
     sendbuff[i] = 0;
@@ -108,10 +122,9 @@ int main(int argc, char** argv) {
   }
 
 
-
   double       inittime,totaltime;
 
-  debug("MPI_Allgather");
+  debug("begin MPI_Allgather");
 
   inittime = MPI_Wtime();
 
@@ -120,26 +133,32 @@ int main(int argc, char** argv) {
                 MPI_COMM_WORLD);
 
   totaltime = MPI_Wtime() - inittime;
-
-  /* for(int i=0; i<N; i++) { */
-  /*   printf("%d ",recvbuff[i]); */
-  /* } */
+  MPI_Barrier(MPI_COMM_WORLD);
+  debug("after MPI_Allgather");
 
 
-  /* for(int i=0; i<N; i++) { */
-  /*   printf("%d ",reference[i]); */
-  /* } */
-
+  for(int i = 0; i < size  ; i += partition) {
+    for(int j = 0; j < 2 * partition; j++) {
+      printf("%d:%d:%d\n",i,j,recvbuff[j]);
+      result[i+j] = recvbuff[j];
+    }
+  }
 
   debug("Testing result");
-  if (testResult(recvbuff, reference, N)) {
+  if (testResult(result, reference, N)) {
     debug("testresult: OK");
   } else {
     debug("testresult: FAILURE");
+    debug("Result:");
+    printArray(result,N);
+    debug("Reference:");
+    printArray(reference,N);
   }
 
-  debug("time used:");
-  printf("%f",totaltime);
+  if(rank == 0) {
+    printf("=> time used:");
+    printf("%f \n",totaltime);
+  }
 
 
   debug("cleaning up");
