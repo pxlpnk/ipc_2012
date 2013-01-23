@@ -8,7 +8,7 @@
 #include "main.h"
 #include "allgather.h"
 
-#define N 10
+#define N 10000
 
 
 void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y) {
@@ -126,9 +126,9 @@ int main(int argc, char** argv) {
 
   totaltime = MPI_Wtime() - inittime;
 
-  for(int i=0; i<N; i++) {
-    printf("%d ",recvbuff[i]);
-  }
+  /* for(int i=0; i<N; i++) { */
+  /*   printf("%d ",recvbuff[i]); */
+  /* } */
 
 
   /* for(int i=0; i<N; i++) { */
@@ -136,15 +136,15 @@ int main(int argc, char** argv) {
   /* } */
 
 
-
   debug("Testing result");
-
-
   if (testResult(recvbuff, reference, N)) {
     debug("testresult: OK");
   } else {
     debug("testresult: FAILURE");
   }
+
+  debug("time used:");
+  printf("%f",totaltime);
 
 
   debug("cleaning up");
