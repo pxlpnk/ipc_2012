@@ -36,8 +36,7 @@ int main(int argc, char** argv) {
   char name[MPI_MAX_PROCESSOR_NAME];
   int nlen;
 
-  int	buffsize;
-  uint sendbuff[N], recvbuff[N], result[N];
+  ATYPE sendbuff[N], recvbuff[N], result[N];
 
   /* ======================================================== */
   /* Initialisation matrix & vector */
@@ -99,8 +98,6 @@ int main(int argc, char** argv) {
 
   debug("Setting up send and receive buffers");
 
-  buffsize = N;
-
   for(int i=0; i<N; i++) {
     recvbuff[i] = vector[i];
   }
@@ -126,8 +123,8 @@ int main(int argc, char** argv) {
 
   inittime = MPI_Wtime();
 
-  MPI_Allgather(&sendbuff, buffsize, ATYPE_MPI,
-                &recvbuff, buffsize, ATYPE_MPI,
+  MPI_Allgather(&sendbuff, partition, ATYPE_MPI,
+                &recvbuff, partition, ATYPE_MPI,
                 MPI_COMM_WORLD);
 
   totaltime = MPI_Wtime() - inittime;
