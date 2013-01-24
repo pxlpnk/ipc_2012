@@ -35,6 +35,16 @@ ATYPE *fillArr(ATYPE *arr, uint n) {
 	return arr;
 }
 
+uint prefixSumEx(ATYPE *arr, uint n) {
+	uint sum = 0;
+	uint i;
+	for (i = 0; i < n; i++) {
+		sum += arr[i];
+		arr[i] = sum;
+	}
+	return sum;
+}
+
 uint prefixSums(ATYPE *arr, uint n, bool exclusive, ATYPE * sums) {
 	uint sum = arr[0];
 	sums[0] = 0; // undefined

@@ -29,6 +29,9 @@ void shuffleArr(ATYPE *arr, uint n);
 /* fills array arr of size n with a counter starting at 0 */
 ATYPE *fillArr(ATYPE *arr, uint n);
 
+/* calculates the exclusive prefix sums of (and *in*) the elements in arr up to and including offset n */
+uint prefixSumEx(ATYPE *arr, uint n);
+
 /* calculates and returns the sum of elements in arr and puts the prefix sums in sums. */
 uint prefixSums(ATYPE *arr, uint n, bool exclusive, ATYPE * sums);
 
