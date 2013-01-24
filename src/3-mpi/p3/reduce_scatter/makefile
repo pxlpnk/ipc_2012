@@ -5,7 +5,7 @@ CWD := $(shell pwd)
 CC = mpicc
 P := $(shell dirname $(CWD))
 EXE ?= $(shell basename $(P))-$(shell basename $(CWD)).exe
-CFLAGS ?= -Wall -pedantic -std=c99 -O3 -g -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT) -D DEBUG=1
+CFLAGS ?= -Wall -pedantic -std=c99 -O3 -g -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT) 
 SRCS := \
 	$(wildcard ../../../shared/*.c) \
 	$(wildcard *.c)

@@ -7,7 +7,7 @@
 #include "../../../shared/util.h"
 #include "main.h"
 
-
+#define REPLAYS 10
 
 #define ROOT 0
 #define N 1000
@@ -16,10 +16,10 @@
 void matrix_vector_mult_ref(ATYPE *x, ATYPE *a, uint n, ATYPE *y) {
 
   for ( int i = 0 ; i < n ; ++i ){
-		for ( int j = 0 ; j < n ; ++j ){
-			y[j] = y[j] + x[i*n+j] * a[i];
-		}
-	}
+    for ( int j = 0 ; j < n ; ++j ){
+      y[j] = y[j] + x[i*n+j] * a[i];
+    }
+  }
 }
 
 
@@ -37,21 +37,21 @@ bool test_vector_part(ATYPE *vector, ATYPE *reference, uint n, uint offset) {
 
 void distribute_vector(ATYPE *root_vector, ATYPE *local_vector, int local_rank, int proc_size, long partition){
   int sendcounts[proc_size], displs[proc_size],i;
-	int rest = N - (partition * ( proc_size - 1) );
+  int rest = N - (partition * ( proc_size - 1) );
 
-	sendcounts[0] = partition;
+  sendcounts[0] = partition;
 
 
-	for ( i = 0 ; i < proc_size ; i++ ){
-		sendcounts[i] = (i == proc_size - 1 ) ? rest : partition;
-		displs[i] = i*partition;
-	}
+  for ( i = 0 ; i < proc_size ; i++ ){
+    sendcounts[i] = (i == proc_size - 1 ) ? rest : partition;
+    displs[i] = i*partition;
+  }
 
-	if ( local_rank == ROOT ){
-		MPI_Scatterv(&(root_vector[0]), sendcounts, displs, MPI_INT, &local_vector[0], partition, MPI_INT, ROOT, MPI_COMM_WORLD);
-	}else{
-		MPI_Scatterv(NULL, sendcounts, displs, MPI_INT, &local_vector[0], partition, MPI_INT, ROOT, MPI_COMM_WORLD);
-	}
+  if ( local_rank == ROOT ){
+    MPI_Scatterv(&(root_vector[0]), sendcounts, displs, MPI_INT, &local_vector[0], partition, MPI_INT, ROOT, MPI_COMM_WORLD);
+  }else{
+    MPI_Scatterv(NULL, sendcounts, displs, MPI_INT, &local_vector[0], partition, MPI_INT, ROOT, MPI_COMM_WORLD);
+  }
 
 }
 
@@ -71,11 +71,11 @@ void distribute_matrix(ATYPE *root_matrix, ATYPE *local_matrix, int local_rank, 
 
 
   for ( int i=0 ; i<proc_size ; ++i ){
-		if ( i == proc_size - 1 ) {
-			sendcounts[i] = rest;
+    if ( i == proc_size - 1 ) {
+      sendcounts[i] = rest;
     }
     else {
-			sendcounts[i] = partition;
+      sendcounts[i] = partition;
     }
     displs[i] = i*partition;
   }
@@ -91,41 +91,41 @@ void distribute_matrix(ATYPE *root_matrix, ATYPE *local_matrix, int local_rank, 
 
 ATYPE*  init_vector(long size, ATYPE value){
   long i;
-	ATYPE *vector = (ATYPE*) malloc (sizeof(ATYPE) * size );
-	if ( vector == NULL ){
-		printf("Error: out of memory!\n");
+  ATYPE *vector = (ATYPE*) malloc (sizeof(ATYPE) * size );
+  if ( vector == NULL ){
+    printf("Error: out of memory!\n");
     MPI_Finalize();
-		exit(EXIT_FAILURE);
-	}
-	for ( i = 0l ; i < size ; ++i ){
-		vector[i] = value;
-	}
-	return vector;
+    exit(EXIT_FAILURE);
+  }
+  for ( i = 0l ; i < size ; ++i ){
+    vector[i] = value;
+  }
+  return vector;
 }
 
 ATYPE* init_matrix(long size, ATYPE value){
-	long i,j;
-	ATYPE *array = (ATYPE*) malloc( sizeof(ATYPE) * size * size);
+  long i,j;
+  ATYPE *array = (ATYPE*) malloc( sizeof(ATYPE) * size * size);
 
-	if ( array == NULL ){
-		printf("Error: out of memory!\n");
-		MPI_Finalize();
-		exit(EXIT_FAILURE);
-	}
+  if ( array == NULL ){
+    printf("Error: out of memory!\n");
+    MPI_Finalize();
+    exit(EXIT_FAILURE);
+  }
 
 
-	for ( i=0l ; i < size ; ++i ){
-		for ( j=0l ; j < size ; ++j ){
-			array[i*size + j] = j;
-		}
-	}
-	return array;
+  for ( i=0l ; i < size ; ++i ){
+    for ( j=0l ; j < size ; ++j ){
+      array[i*size + j] = j;
+    }
+  }
+  return array;
 }
 
 
 void compute_reduce_scatter(ATYPE *matrix, ATYPE *vector, ATYPE *result, int local_rank, int proc_size , long n, long partition) {
   ATYPE *temp_result = init_vector(N,0);
-	int recvcounts[proc_size];
+  int recvcounts[proc_size];
 
 
   for( int i=0; i < proc_size; i++) {
@@ -133,10 +133,10 @@ void compute_reduce_scatter(ATYPE *matrix, ATYPE *vector, ATYPE *result, int loc
   }
 
   for ( int i = 0 ; i < partition ; ++i ){
-		for ( int j = 0 ; j < N ; ++j ){
-			temp_result[j] = temp_result[j] + matrix[i*n+j] * vector[i];
-		}
-	}
+    for ( int j = 0 ; j < N ; ++j ){
+      temp_result[j] = temp_result[j] + matrix[i*n+j] * vector[i];
+    }
+  }
 }
 
 
@@ -196,43 +196,43 @@ int main(int argc, char** argv) {
   printf("size/rank: %d\n", (size/(rank+1)));
   printf("partition: %d\n", partition);
 
-
   /* ======================================================== */
   /* distributing matrix */
 
+  for( int i=0; i< REPLAYS; i++) {
 
-  distribute_vector(vector, local_vector, rank, size, partition);
-  distribute_matrix(matrix, local_matrix, rank, size, partition);
+    distribute_vector(vector, local_vector, rank, size, partition);
+    distribute_matrix(matrix, local_matrix, rank, size, partition);
 
-  double       inittime,totaltime;
+    double       inittime,totaltime;
 
-  debug("begin MPI_Reduce_scatter");
-  MPI_Barrier(MPI_COMM_WORLD);
-  inittime = MPI_Wtime();
-  compute_reduce_scatter(local_matrix, local_vector, result, rank, size, N, partition);
-  MPI_Barrier(MPI_COMM_WORLD);
-  totaltime = MPI_Wtime() - inittime;
-  debug("after MPI_Reduce_scatter");
+    debug("begin MPI_Reduce_scatter");
+    MPI_Barrier(MPI_COMM_WORLD);
+    inittime = MPI_Wtime();
+    compute_reduce_scatter(local_matrix, local_vector, result, rank, size, N, partition);
+    MPI_Barrier(MPI_COMM_WORLD);
+    totaltime = MPI_Wtime() - inittime;
+    debug("after MPI_Reduce_scatter");
 
 
-  /* debug("Testing result"); */
-  /* if (test_vector_part(result, recvbuff, (rank * partition) , partition)) { */
-  /*   debug("testresult: OK"); */
-  /* } else { */
-  /*   debug("testresult: FAILURE"); */
-  /*   debug("Result:"); */
-  /*   printArray(recvbuff, N); */
-  /*   debug("Reference:"); */
-  /*   printArray(reference,N); */
-  /* } */
+    /* debug("Testing result"); */
+    /* if (test_vector_part(result, recvbuff, (rank * partition) , partition)) { */
+    /*   debug("testresult: OK"); */
+    /* } else { */
+    /*   debug("testresult: FAILURE"); */
+    /*   debug("Result:"); */
+    /*   printArray(recvbuff, N); */
+    /*   debug("Reference:"); */
+    /*   printArray(reference,N); */
+    /* } */
 
-  MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
 
-  if(rank == 0) {
-    printf("=> time used:");
-    printf("%f \n",totaltime);
+    if(rank == 0) {
+      printf("=> time used:");
+      printf("%f \n",totaltime);
+    }
   }
-
 
   debug("cleaning up");
 
