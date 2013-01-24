@@ -156,6 +156,7 @@ int main(int argc, char** argv) {
 
   debug("cleaning up");
 
+  free(revcounts);
   free(vector);
   for(int i=0; i<N; i++) {
     free(matrix[i]);
