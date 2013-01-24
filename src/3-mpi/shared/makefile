@@ -7,7 +7,9 @@ CC = mpicc
 P := $(shell dirname $(CWD))
 EXE ?= $(shell basename $(P))-$(shell basename $(CWD)).exe
 CFLAGS ?= -Wall -pedantic -std=c99 -O3 -g -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT) -D ATYPE_MPI=$(ATYPE_MPI) -D DBG
+CPPFLAGS ?= -I ../../../shared/ -I ../../shared/
 SRCS := \
+	$(wildcard ../../../shared/*.c) \
 	$(wildcard ../../shared/*.c) \
 	$(wildcard *.c)
 OBJS = $(SRCS:%.c=%.o)
@@ -19,7 +21,7 @@ all: $(EXE)
 	$(CC) $(CFLAGS) $^ -o $@
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 clean:
 	rm -rf $(EXE) $(OBJS)

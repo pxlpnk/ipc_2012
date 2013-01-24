@@ -4,7 +4,7 @@
 // MPI header
 #include <mpi.h>
 
-#include "../../../shared/util.h"
+#include "util.h"
 #include "main.h"
 
 #define N 10000
@@ -126,8 +126,8 @@ int main(int argc, char** argv) {
 
   inittime = MPI_Wtime();
 
-  MPI_Allgather(&sendbuff, buffsize, MPI_INT,
-                &recvbuff, buffsize, MPI_INT,
+  MPI_Allgather(&sendbuff, buffsize, ATYPE_MPI,
+                &recvbuff, buffsize, ATYPE_MPI,
                 MPI_COMM_WORLD);
 
   totaltime = MPI_Wtime() - inittime;

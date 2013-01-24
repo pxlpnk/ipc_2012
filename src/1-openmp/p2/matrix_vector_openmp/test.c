@@ -149,7 +149,7 @@ int main (int argc, char *argv[]) {
     fprintf(false_sharing,"%d,%lf\n",i,mtime);
 
 
-#ifdef DEBUG
+#ifdef DBG
     if ( !testResult(product, ref_output, n)) {
       printf("=======> Wrong result\n");
       return 1;
@@ -169,7 +169,7 @@ int main (int argc, char *argv[]) {
 
     fprintf(tiling,"%d,%lf\n",i,mtime);
 
-#ifdef DEBUG
+#ifdef DBG
     if ( !testResult(product, ref_output, n)) {
       printf("=======> Wrong result\n");
       return 1;

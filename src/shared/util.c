@@ -132,7 +132,7 @@ char *time_stamp() {
 
 
 void debug (char *msg){
-#ifdef DEBUG
+#ifdef DBG
   printf("=> %s\n", msg);
 #endif
 }

@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <mpi.h>
-#include "../../shared/util.h"
+#include "util.h"
 
 static const int root = 0;
 static int rank, size;

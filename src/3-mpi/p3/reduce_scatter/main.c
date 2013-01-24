@@ -4,7 +4,7 @@
 // MPI header
 #include <mpi.h>
 
-#include "../../../shared/util.h"
+#include "util.h"
 #include "main.h"
 
 #define REPLAYS 10
@@ -48,9 +48,9 @@ void distribute_vector(ATYPE *root_vector, ATYPE *local_vector, int local_rank, 
   }
 
   if ( local_rank == ROOT ){
-    MPI_Scatterv(&(root_vector[0]), sendcounts, displs, MPI_INT, &local_vector[0], partition, MPI_INT, ROOT, MPI_COMM_WORLD);
+    MPI_Scatterv(&(root_vector[0]), sendcounts, displs, ATYPE_MPI, &local_vector[0], partition, ATYPE_MPI, ROOT, MPI_COMM_WORLD);
   }else{
-    MPI_Scatterv(NULL, sendcounts, displs, MPI_INT, &local_vector[0], partition, MPI_INT, ROOT, MPI_COMM_WORLD);
+    MPI_Scatterv(NULL, sendcounts, displs, ATYPE_MPI, &local_vector[0], partition, ATYPE_MPI, ROOT, MPI_COMM_WORLD);
   }
 
 }
@@ -65,7 +65,7 @@ void distribute_matrix(ATYPE *root_matrix, ATYPE *local_matrix, int local_rank, 
   int rest = N - (partition * ( proc_size - 1) );
 
 
-  MPI_Type_vector(N, 1, N, MPI_INT, &MPI_type2);
+  MPI_Type_vector(N, 1, N, ATYPE_MPI, &MPI_type2);
   MPI_Type_create_resized( MPI_type2, 0, sizeof(ATYPE), &MPI_type);
   MPI_Type_commit(&MPI_type);
 
@@ -83,7 +83,7 @@ void distribute_matrix(ATYPE *root_matrix, ATYPE *local_matrix, int local_rank, 
   if ( local_rank == ROOT )
     sendbuffer = &(root_matrix[0]);
 
-  MPI_Scatterv( sendbuffer, sendcounts, displs, MPI_type, &(local_matrix[0]), partition*N, MPI_INT, ROOT, MPI_COMM_WORLD );
+  MPI_Scatterv( sendbuffer, sendcounts, displs, MPI_type, &(local_matrix[0]), partition*N, ATYPE_MPI, ROOT, MPI_COMM_WORLD );
   MPI_Type_free(&MPI_type);
 }
 
