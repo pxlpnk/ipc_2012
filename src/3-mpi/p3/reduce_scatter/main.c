@@ -7,7 +7,7 @@
 #include "../../../shared/util.h"
 #include "main.h"
 
-#define N 10000
+#define N 1024
 
 
 void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y) {
@@ -156,7 +156,6 @@ int main(int argc, char** argv) {
 
   debug("cleaning up");
 
-  free(revcounts);
   free(vector);
   for(int i=0; i<N; i++) {
     free(matrix[i]);
