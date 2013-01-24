@@ -7,7 +7,7 @@ P := $(shell dirname $(CWD))
 EXE ?= $(shell basename $(P))-$(shell basename $(CWD)).exe
 CFLAGS ?= -Wall -pedantic -std=c99 -O3 -g -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT) -D DEBUG=1
 SRCS := \
-	$(wildcard ../../shared/*.c) \
+	$(wildcard ../../../shared/*.c) \
 	$(wildcard *.c)
 OBJS = $(SRCS:%.c=%.o)
 

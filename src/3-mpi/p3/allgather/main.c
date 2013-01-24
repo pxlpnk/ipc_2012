@@ -6,7 +6,6 @@
 
 #include "../../../shared/util.h"
 #include "main.h"
-#include "allgather.h"
 
 #define N 10000
 
