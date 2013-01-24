@@ -1,11 +1,12 @@
 ATYPE ?= int
 ATYPEPRINT ?= "\"08d\"" #printf characters for ATYPE
+ATYPE_MPI ?= MPI_INT
 SHELL = /bin/sh
 CWD := $(shell pwd)
 CC = mpicc
 P := $(shell dirname $(CWD))
 EXE ?= $(shell basename $(P))-$(shell basename $(CWD)).exe
-CFLAGS ?= -Wall -pedantic -std=c99 -O3 -g -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT) -D DBG
+CFLAGS ?= -Wall -pedantic -std=c99 -O3 -g -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT) -D ATYPE_MPI=$(ATYPE_MPI) -D DBG
 SRCS := \
 	$(wildcard ../../shared/*.c) \
 	$(wildcard *.c)
