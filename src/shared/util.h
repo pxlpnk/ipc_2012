@@ -52,3 +52,8 @@ int min(uint x, uint y);
 
 /*returns the current time as time stamp */
 char *time_stamp();
+
+
+/* prints debug messages when debug is set */
+
+void debug (char *msg);
