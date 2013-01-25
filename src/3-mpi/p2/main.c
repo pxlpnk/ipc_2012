@@ -4,25 +4,41 @@
 #include <mpi.h>
 #include "util.h"
 
-static const int root = 0;
-static int rank, size;
-static ATYPE *cor;
 
-void arrayscan(ATYPE A[], int n, MPI_Comm comm) {
-	int loc = prefixSumEx(A, n);
-	int rcv = 0;
-
-	MPI_Exscan(&loc, &rcv, 1, ATYPE_MPI, MPI_SUM, comm);
-
-	uint i;
-	for (i = 0; i < n; i++) {
-		A[i] += rcv;
+void arrayscan(ATYPE A[], uint n, int rank, int size, MPI_Comm comm) {
+	/* distribute the array in smaller, approximately equal sized blocks of size ~n/size.
+	 * the maximum error of block size is size-1 */
+	const uint block_size = (rank != size-1) ? n/size : n - (n/size)*rank;
+	ATYPE *block = A + (n/size) * rank;
+	ATYPE block_sum = prefixSumEx(block, block_size);
+	ATYPE preprefix = 0;
+	for (uint k = 1; k < size; k <<= 1) {
+		ATYPE tmp = block_sum + preprefix;
+		mpi_printf(0, "k=%d. ", k);
+		MPI_Request request;
+		if (rank < size - k) { // initiate send to rank + k
+			printf("%d sends %" ATYPEPRINT " to %d\n", rank, tmp, rank + k);
+			MPI_Isend(&tmp, 1, ATYPE_MPI, rank + k, k, comm, &request);
+		}
+		if (rank >= k) { // rcv from rank - k
+			MPI_Recv(&tmp, 1, ATYPE_MPI, rank - k, k, comm, MPI_STATUS_IGNORE);
+			printf("%d received %" ATYPEPRINT " from %d\n", rank, tmp, rank - k);
+		}
+		if (rank < size - k) { // complete send
+			MPI_Wait(&request, MPI_STATUS_IGNORE);
+		}
+		if (rank >= k) { // add to local
+			preprefix = tmp + preprefix;
+		}
+	}
+	printf("%d: preprefix %" ATYPEPRINT ", block_sum %" ATYPEPRINT "\n", rank, preprefix, block_sum);
+	for (uint i = 0; i < block_size; i++) {
+		block[i] += preprefix;
 	}
 }
 
 int main(int argc, char *argv[])
 {
-	MPI_Comm comm = MPI_COMM_WORLD;
 	uint n = (argv[1] != NULL) ? atoi(argv[1]) : 0; // TODO: error handling
 	if (n == 0) {
 		printf("N not given!\n");
@@ -35,12 +51,15 @@ int main(int argc, char *argv[])
 
 	arr = fillArr(arr, n);
 
-	cor = malloc(sizeof(ATYPE) * n);
+	ATYPE *cor = malloc(sizeof(ATYPE) * n);
 	if (cor == NULL)
 		return EXIT_FAILURE;
 
 	prefixSums(arr, n, false, cor);
 
+	int rank, size;
+	const int root = 0;
+	const MPI_Comm comm = MPI_COMM_WORLD;
 	MPI_Init(&argc, &argv);
 
 	MPI_Comm_size(comm, &size);
@@ -48,12 +67,7 @@ int main(int argc, char *argv[])
 
 	double inittime = MPI_Wtime();
 
-	/* distribute the array in smaller, approximately equal sized blocks of size ~n/size.
-	 * the maximum error of block size is size-1 */
-	if (rank != size-1)
-		arrayscan(arr + (n/size) * rank, n/size, comm);
-	else
-		arrayscan(arr + (n/size) * rank, n - (n/size)*rank, comm);
+	arrayscan(arr, n, rank, size, comm);
 
 	MPI_Barrier(comm);
 	double totaltime = MPI_Wtime() - inittime;
