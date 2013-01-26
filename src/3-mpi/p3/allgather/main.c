@@ -7,8 +7,7 @@
 #include "util.h"
 #include "main.h"
 
-#define N 10000
-
+#define root 0
 
 void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y) {
   for(uint i=0; i<n; i++) {
@@ -31,7 +30,26 @@ bool test_vector_part(ATYPE *vector, ATYPE *reference, uint n, uint offset) {
 
 
 int main(int argc, char** argv) {
-  int rank, size;
+  int rank, size, N;
+  MPI_Init(&argc,&argv);
+
+  // get rank and size from communicator
+  MPI_Comm_size(MPI_COMM_WORLD,&size);
+  MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+
+
+  if ( argc != 2 ){
+		if ( rank == root ){
+      printf("Usage: mpirun -nn nodecount p3-allgather.exe N\n");
+      printf("N is the the matrix size. \n\n");
+		}
+		return 1;
+  }
+
+	N = atol(argv[1]);
+
+
+
 
   char name[MPI_MAX_PROCESSOR_NAME];
   int nlen;
@@ -83,16 +101,6 @@ int main(int argc, char** argv) {
   matrix_vector_mult_ref(matrix, vector, N , N, reference);
 
 
-
-  MPI_Init(&argc,&argv);
-
-  // get rank and size from communicator
-  MPI_Comm_size(MPI_COMM_WORLD,&size);
-  MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-
-  MPI_Get_processor_name(name,&nlen);
-
-
   /* ======================================================== */
   /* Initialisation send and receive buffers */
 
@@ -103,11 +111,6 @@ int main(int argc, char** argv) {
   }
 
   int partition = N/size;
-
-  printf("Rank: %d\n", rank);
-  printf("size/rank: %d\n", (size/(rank+1)));
-  printf("partition: %d\n", partition);
-
 
   for(int i= (rank * partition); i < ((rank + 1 ) * partition) ; i++) {
     sendbuff[i] = 0;
@@ -146,8 +149,7 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD);
 
   if(rank == 0) {
-    printf("=> time used:");
-    printf("%f \n",totaltime);
+    printf("%d,%f\n",N, totaltime);
   }
 
 

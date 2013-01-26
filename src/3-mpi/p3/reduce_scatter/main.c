@@ -7,10 +7,7 @@
 #include "util.h"
 #include "main.h"
 
-#define REPLAYS 10
-
-#define ROOT 0
-#define N 1000
+#define root 0
 
 
 void matrix_vector_mult_ref(ATYPE *x, ATYPE *a, uint n, ATYPE *y) {
@@ -35,7 +32,7 @@ bool test_vector_part(ATYPE *vector, ATYPE *reference, uint n, uint offset) {
 /* ======================================================== */
 /* distributing usinge scatterv */
 
-void distribute_vector(ATYPE *root_vector, ATYPE *local_vector, int local_rank, int proc_size, long partition){
+void distribute_vector(ATYPE *root_vector, ATYPE *local_vector, int local_rank, int proc_size, long partition, uint N){
   int sendcounts[proc_size], displs[proc_size],i;
   int rest = N - (partition * ( proc_size - 1) );
 
@@ -47,15 +44,15 @@ void distribute_vector(ATYPE *root_vector, ATYPE *local_vector, int local_rank, 
     displs[i] = i*partition;
   }
 
-  if ( local_rank == ROOT ){
-    MPI_Scatterv(&(root_vector[0]), sendcounts, displs, ATYPE_MPI, &local_vector[0], partition, ATYPE_MPI, ROOT, MPI_COMM_WORLD);
+  if ( local_rank == root ){
+    MPI_Scatterv(&(root_vector[0]), sendcounts, displs, ATYPE_MPI, &local_vector[0], partition, ATYPE_MPI, root, MPI_COMM_WORLD);
   }else{
-    MPI_Scatterv(NULL, sendcounts, displs, ATYPE_MPI, &local_vector[0], partition, ATYPE_MPI, ROOT, MPI_COMM_WORLD);
+    MPI_Scatterv(NULL, sendcounts, displs, ATYPE_MPI, &local_vector[0], partition, ATYPE_MPI, root, MPI_COMM_WORLD);
   }
 
 }
 
-void distribute_matrix(ATYPE *root_matrix, ATYPE *local_matrix, int local_rank, int proc_size, long partition){
+void distribute_matrix(ATYPE *root_matrix, ATYPE *local_matrix, int local_rank, int proc_size, long partition, uint N){
   int sendcounts[proc_size], displs[proc_size];
   ATYPE *sendbuffer=NULL;
 
@@ -80,10 +77,10 @@ void distribute_matrix(ATYPE *root_matrix, ATYPE *local_matrix, int local_rank, 
     displs[i] = i*partition;
   }
 
-  if ( local_rank == ROOT )
+  if ( local_rank == root )
     sendbuffer = &(root_matrix[0]);
 
-  MPI_Scatterv( sendbuffer, sendcounts, displs, MPI_type, &(local_matrix[0]), partition*N, ATYPE_MPI, ROOT, MPI_COMM_WORLD );
+  MPI_Scatterv( sendbuffer, sendcounts, displs, MPI_type, &(local_matrix[0]), partition*N, ATYPE_MPI, root, MPI_COMM_WORLD );
   MPI_Type_free(&MPI_type);
 }
 
@@ -123,7 +120,7 @@ ATYPE* init_matrix(long size, ATYPE value){
 }
 
 
-void compute_reduce_scatter(ATYPE *matrix, ATYPE *vector, ATYPE *result, int local_rank, int proc_size , long n, long partition) {
+void compute_reduce_scatter(ATYPE *matrix, ATYPE *vector, ATYPE *result, int local_rank, int proc_size , long N, long partition) {
   ATYPE *temp_result = init_vector(N,0);
   int recvcounts[proc_size];
 
@@ -134,26 +131,33 @@ void compute_reduce_scatter(ATYPE *matrix, ATYPE *vector, ATYPE *result, int loc
 
   for ( int i = 0 ; i < partition ; ++i ){
     for ( int j = 0 ; j < N ; ++j ){
-      temp_result[j] = temp_result[j] + matrix[i*n+j] * vector[i];
+      temp_result[j] = temp_result[j] + matrix[i*N+j] * vector[i];
     }
   }
 }
 
 
+int N;
 
 int main(int argc, char** argv) {
   int rank, size;
-
-  char name[MPI_MAX_PROCESSOR_NAME];
-  int nlen;
-
   MPI_Init(&argc,&argv);
 
   // get rank and size from communicator
   MPI_Comm_size(MPI_COMM_WORLD,&size);
   MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 
-  MPI_Get_processor_name(name,&nlen);
+
+  if ( argc != 2 ){
+		if ( rank == root ){
+      printf("Usage: mpirun -nn nodecount p3-allgather.exe N\n");
+      printf("N is the the matrix size. \n\n");
+		}
+		return 1;
+  }
+
+	N = atol(argv[1]);
+
 
   /* ======================================================== */
   /* Initialisation matrix & vector */
@@ -162,8 +166,8 @@ int main(int argc, char** argv) {
   ATYPE *vector = NULL;
 
 
-  if (rank == ROOT) {
-    debug("Setting up ROOT data structures");
+  if (rank == root) {
+    debug("Setting up root data structures");
     matrix = init_matrix(N,1);
     vector = init_vector(N,1);
   }
@@ -185,53 +189,47 @@ int main(int argc, char** argv) {
   ATYPE *result = NULL;
   result = init_vector(N,1);
 
-  if(rank == ROOT){
+  if(rank == root){
     debug("Comptuting reference");
     matrix_vector_mult_ref(matrix, vector, N, reference);
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  printf("Rank: %d\n", rank);
-  printf("size/rank: %d\n", (size/(rank+1)));
-  printf("partition: %d\n", partition);
-
   /* ======================================================== */
-  /* distributing matrix */
-
-  for( int i=0; i< REPLAYS; i++) {
-
-    distribute_vector(vector, local_vector, rank, size, partition);
-    distribute_matrix(matrix, local_matrix, rank, size, partition);
-
-    double       inittime,totaltime;
-
-    debug("begin MPI_Reduce_scatter");
-    MPI_Barrier(MPI_COMM_WORLD);
-    inittime = MPI_Wtime();
-    compute_reduce_scatter(local_matrix, local_vector, result, rank, size, N, partition);
-    MPI_Barrier(MPI_COMM_WORLD);
-    totaltime = MPI_Wtime() - inittime;
-    debug("after MPI_Reduce_scatter");
+  /* distributing matrix and vector */
 
 
-    /* debug("Testing result"); */
-    /* if (test_vector_part(result, recvbuff, (rank * partition) , partition)) { */
-    /*   debug("testresult: OK"); */
-    /* } else { */
-    /*   debug("testresult: FAILURE"); */
-    /*   debug("Result:"); */
-    /*   printArray(recvbuff, N); */
-    /*   debug("Reference:"); */
-    /*   printArray(reference,N); */
-    /* } */
+  distribute_vector(vector, local_vector, rank, size, partition, N);
+  distribute_matrix(matrix, local_matrix, rank, size, partition, N);
 
-    MPI_Barrier(MPI_COMM_WORLD);
+  double       inittime,totaltime;
 
-    if(rank == 0) {
-      printf("=> time used:");
-      printf("%f \n",totaltime);
-    }
+  debug("begin MPI_Reduce_scatter");
+  MPI_Barrier(MPI_COMM_WORLD);
+  inittime = MPI_Wtime();
+  compute_reduce_scatter(local_matrix, local_vector, result, rank, size, N, partition);
+  MPI_Barrier(MPI_COMM_WORLD);
+  totaltime = MPI_Wtime() - inittime;
+  debug("after MPI_Reduce_scatter");
+
+
+  /* debug("Testing result"); */
+  /* if (test_vector_part(result, recvbuff, (rank * partition) , partition)) { */
+  /*   debug("testresult: OK"); */
+  /* } else { */
+  /*   debug("testresult: FAILURE"); */
+  /*   debug("Result:"); */
+  /*   printArray(recvbuff, N); */
+  /*   debug("Reference:"); */
+  /*   printArray(reference,N); */
+  /* } */
+
+  MPI_Barrier(MPI_COMM_WORLD);
+
+
+  if(rank == 0) {
+    printf("%d,%f\n",N, totaltime);
   }
 
   debug("cleaning up");
