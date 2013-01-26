@@ -83,19 +83,19 @@ int main(int argc, char *argv[])
 	}
 
 	if (n == 0) {
-		return EXIT_FAILURE;
 		mpi_printf(root, "N not given!\n");
+		goto err_mpi;
 	}
 
 	ATYPE *arr = malloc(sizeof(ATYPE) * n);
 	if (arr == NULL)
-		return EXIT_FAILURE;
+		goto err_mpi;
 
 	arr = fillArr(arr, n);
 
 	ATYPE *cor = malloc(sizeof(ATYPE) * n);
 	if (cor == NULL)
-		return EXIT_FAILURE;
+		goto err_arr;
 
 	prefixSums(arr, n, false, cor);
 
@@ -133,5 +133,13 @@ int main(int argc, char *argv[])
 		printf("Correct? %s\n", memcmp(cor, arr, sizeof(ATYPE) * n) == 0 ? "yes" : "no");
 	}
 
+	free(arr);
+	free(cor);
 	return 0;
+
+err_arr:
+	free(arr);
+err_mpi:
+	MPI_Finalize();
+	return EXIT_FAILURE;
 }
