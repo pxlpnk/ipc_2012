@@ -50,10 +50,6 @@ int main(int argc, char** argv) {
 
 
 
-
-  char name[MPI_MAX_PROCESSOR_NAME];
-  int nlen;
-
   ATYPE sendbuff[N], recvbuff[N], result[N];
 
   /* ======================================================== */
@@ -134,18 +130,18 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD);
   debug("after MPI_Allgather");
 
-
-  debug("Testing result");
-  if (test_vector_part(result, recvbuff, (rank * partition) , partition)) {
-    debug("testresult: OK");
-  } else {
-    debug("testresult: FAILURE");
-    debug("Result:");
-    printArray(recvbuff, N);
-    debug("Reference:");
-    printArray(reference,N);
+  if (rank == root) {
+    debug("Testing result");
+    if (test_vector_part(result, recvbuff, (rank * partition) , partition)) {
+      debug("testresult: OK");
+    } else {
+      debug("testresult: FAILURE");
+      debug("Result:");
+      printArray(recvbuff, N);
+      debug("Reference:");
+      printArray(reference,N);
+    }
   }
-
   MPI_Barrier(MPI_COMM_WORLD);
 
   if(rank == 0) {
