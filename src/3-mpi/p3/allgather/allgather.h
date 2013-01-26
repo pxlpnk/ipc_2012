@@ -1,1 +1,0 @@
-/* Allgather algorithm */
