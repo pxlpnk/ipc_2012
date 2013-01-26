@@ -3,7 +3,7 @@
 
 // MPI header
 #include <mpi.h>
-
+#include <getopt.h>
 #include "util.h"
 #include "main.h"
 
@@ -137,26 +137,41 @@ void compute_reduce_scatter(ATYPE *matrix, ATYPE *vector, ATYPE *result, int loc
 }
 
 
-int N;
+
 
 int main(int argc, char** argv) {
   int rank, size;
+  int N;
+  char opt;
+
+  static const char optstring[] = "n:a:f:";
+  static const struct option long_options[] = {
+		{"n",			1, NULL, 'n'},
+		{NULL,			0, NULL, 0}
+  };
+
+
   MPI_Init(&argc,&argv);
 
   // get rank and size from communicator
   MPI_Comm_size(MPI_COMM_WORLD,&size);
   MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 
+	while ((opt = getopt_long(argc, argv, optstring, long_options, NULL)) != EOF) {
+    switch(opt) {
+    case 'n':
+      N = atoi(optarg);
+      break;
+    }
+  }
 
-  if ( argc != 2 ){
+  if(N == 0) {
 		if ( rank == root ){
-      printf("Usage: mpirun -nn nodecount p3-allgather.exe N\n");
+      printf("Usage: mpirun -nn nodecount p3-reduce_scatter.exe -n N\n");
       printf("N is the the matrix size. \n\n");
 		}
 		return 1;
   }
-
-	N = atol(argv[1]);
 
 
   /* ======================================================== */
