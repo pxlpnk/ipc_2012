@@ -46,6 +46,7 @@ void arrayscan(ATYPE A[], uint n, int rank, int size, MPI_Comm comm, algo_t algo
 
 int main(int argc, char *argv[])
 {
+	int ret = EXIT_SUCCESS;
 	const int root = 0;
 	const MPI_Comm comm = MPI_COMM_WORLD;
 	int rank, size;
@@ -77,25 +78,31 @@ int main(int argc, char *argv[])
 				mpi_printf(root, "Warning: unknown algorithm %s, using default.\n", optarg);
 			break;
 		default:
-			usage_abort();
+			ret = EXIT_FAILURE;
+			goto out_mpi;
 			break;
 		}
 	}
 
 	if (n == 0) {
 		mpi_printf(root, "N not given!\n");
-		goto err_mpi;
+		ret = EXIT_FAILURE;
+		goto out_mpi;
 	}
 
 	ATYPE *arr = malloc(sizeof(ATYPE) * n);
-	if (arr == NULL)
-		goto err_mpi;
+	if (arr == NULL) {
+		ret = EXIT_FAILURE;
+		goto out_mpi;
+	}
 
 	arr = fillArr(arr, n);
 
 	ATYPE *cor = malloc(sizeof(ATYPE) * n);
-	if (cor == NULL)
-		goto err_arr;
+	if (cor == NULL) {
+		ret = EXIT_FAILURE;
+		goto out_arr;
+	}
 
 	prefixSums(arr, n, false, cor);
 
@@ -124,8 +131,6 @@ int main(int argc, char *argv[])
 	else
 		MPI_Gatherv(arr + (n/size) * rank, n/size, ATYPE_MPI, NULL, 0, 0, 0, root, comm);
 
-	MPI_Finalize();
-
 	if (rank == 0) {
 		if (n < 100)
 			printArrs(cor, arr, n);
@@ -133,13 +138,10 @@ int main(int argc, char *argv[])
 		printf("Correct? %s\n", memcmp(cor, arr, sizeof(ATYPE) * n) == 0 ? "yes" : "no");
 	}
 
-	free(arr);
 	free(cor);
-	return 0;
-
-err_arr:
+out_arr:
 	free(arr);
-err_mpi:
+out_mpi:
 	MPI_Finalize();
-	return EXIT_FAILURE;
+	return ret;
 }
