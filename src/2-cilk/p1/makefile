@@ -5,7 +5,7 @@ CWD := $(shell pwd)
 CC ?= gcc
 P := $(shell dirname $(CWD))
 EXE ?= $(shell basename $(P))-$(shell basename $(CWD)).exe
-CFLAGS ?= -Wall -DATYPE=$(ATYPE) -DATYPEPRINT=$(ATYPEPRINT) -O3 -DDBG -g
+CFLAGS ?= -Wall -DATYPE=$(ATYPE) -DATYPEPRINT=$(ATYPEPRINT) -O3
 CILKFLAGS ?= -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=200809L
 HDRS := \
 	$(wildcard ../../shared/*.h)
@@ -17,6 +17,9 @@ CILKDSRCS := \
 	$(wildcard *.cilk)
 
 all: $(EXE)
+
+debug: CFLAGS += -DDBG -g
+debug: $(EXE)
 
 %.exe: $(CILKDSRCS) $(SRCS) $(HDRS)
 	cilkc $(CFLAGS) $(CILKFLAGS) $(CILKDSRCS) $(SRCS) -o $@
