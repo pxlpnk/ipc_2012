@@ -1,11 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <getopt.h>
 #include <mpi.h>
 #include "util.h"
 
 typedef enum algo {native, custom} algo_t;
+static const char *algo2str[] = {
+	"native",
+	"custom"
+};
 
 void arrayscan(ATYPE A[], uint n, int rank, int size, MPI_Comm comm, algo_t algo) {
 	/* distribute the array in smaller, approximately equal sized blocks of size ~n/size.
@@ -54,18 +59,29 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(comm, &size);
 	MPI_Comm_rank(comm, &rank);
 
+	FILE *f = NULL;
+
 	char opt;
 	uint n = 0;
 	algo_t algo = custom;
-	static const char optstring[] = "n:a:";
+	static const char optstring[] = "n:a:f:";
 	static const struct option long_options[] = {
 		{"n",			1, NULL, 'n'},
+		{"file",		1, NULL, 'f'},
 		{NULL,			0, NULL, 0},
 	};
 	while ((opt = getopt_long(argc, argv, optstring, long_options, NULL)) != EOF) {
 		switch (opt) {
 		case 'n':
 			n = atoi(optarg); // TODO: error handling
+			break;
+		case 'f':
+			f = fopen(optarg,"a");
+			if (f == NULL) {
+				mpi_printf(root, "Could not open log file '%s': %s\n", optarg, strerror(errno));
+				ret = EXIT_FAILURE;
+				goto out_mpi;
+			}
 			break;
 		case 'a':
 			if (strcmp("native", optarg) == 0) {
@@ -135,7 +151,15 @@ int main(int argc, char *argv[])
 		if (n < 100)
 			printArrs(cor, arr, n);
 
-		printf("Correct? %s\n", memcmp(cor, arr, sizeof(ATYPE) * n) == 0 ? "yes" : "no");
+		printf("Correct? ");
+		if (memcmp(cor, arr, sizeof(ATYPE) * n) == 0) {
+			printf("yes\n");
+			if (f != NULL)
+				fprintf(f,"%s,%d,%d,%lf\n", algo2str[algo], size, n , totaltime);
+		} else {
+			printf("no\n");
+			ret = EXIT_FAILURE;
+		}
 	}
 
 	free(cor);
@@ -143,5 +167,7 @@ out_arr:
 	free(arr);
 out_mpi:
 	MPI_Finalize();
+	if (f != NULL)
+		fclose(f);
 	return ret;
 }
