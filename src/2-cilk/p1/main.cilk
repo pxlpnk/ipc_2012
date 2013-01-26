@@ -11,11 +11,6 @@
 void EXPORT(datapara) (CilkContext *const ctx, ATYPE a[], uint n, uint t);
 void EXPORT(rec) (CilkContext *const ctx, ATYPE *a[], uint n);
 
-void usage_abort(void) {
-	fprintf(stderr, "Aborting…\n");
-	exit(EXIT_FAILURE);
-}
-
 cilk void inplace_double(ATYPE arr[], uint n, uint k) {
 	uint i;
 	uint kk = k<<1;

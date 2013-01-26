@@ -63,3 +63,6 @@ char *time_stamp();
 
 /* prints debug messages when debug is set */
 void debug (char *msg);
+
+/* just get me out of here */
+void usage_abort(void);
