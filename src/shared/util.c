@@ -136,3 +136,8 @@ void debug (char *msg){
   printf("=> %s\n", msg);
 #endif
 }
+
+void usage_abort(void) {
+	fprintf(stderr, "Aborting...\n");
+	exit(EXIT_FAILURE);
+}
