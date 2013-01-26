@@ -29,4 +29,4 @@ clean:
 .PHONY = clean all
 
 run: $(EXE)
-	mpirun -np 4 $^ $(ARGS)
+	mpirun -np 2 $^ $(ARGS)
