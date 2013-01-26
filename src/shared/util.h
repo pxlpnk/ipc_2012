@@ -10,9 +10,14 @@
 	#define false 0
 #endif
 
-#ifndef DBG
+#ifdef DBG
+#define mpi_printf(r, ...) \
+	if (rank == r)\
+		printf(__VA_ARGS__)
+#else
 #undef printf
-#define printf(...)
+#define printf(...) /* compiled away */
+#define mpi_printf(...) /* compiled away */
 #endif
 
 typedef unsigned int uint;
@@ -56,7 +61,5 @@ int min(uint x, uint y);
 /*returns the current time as time stamp */
 char *time_stamp();
 
-
 /* prints debug messages when debug is set */
-
 void debug (char *msg);
