@@ -37,14 +37,19 @@ cilk void inplace_halve(ATYPE arr[], uint cnt, uint k) {
 cilk void datapara(ATYPE arr[], uint n, uint t) {
 	uint k, kk, i;
 	for (k = 1; k < n; k = kk) {
-		uint start, units, end;
 		uint ratio;
+		uint units;
+		#ifdef DBG
+			uint start, end;
+		#endif
 		kk = k<<1; // double
-		start = kk-1;
-		end = n;
 		units = n/kk;
 		ratio = units/t;
-		printf("double: n=%d, k=%d, start=%d, end=%d, step=%d, units=%d, ratio=%d\n", n, k, start, end, kk, units, ratio);
+		#ifdef DBG
+			start = kk-1;
+			end = n;
+			printf("double: n=%d, k=%d, start=%d, end=%d, step=%d, units=%d, ratio=%d\n", n, k, start, end, kk, units, ratio);
+		#endif
 		if (ratio < MIN_OPS_PER_THREAD) {
 			for (i = kk-1; i < n; i += kk) {
 				printf("%d: %p += %p\n", i, arr+i, arr+i-k);
