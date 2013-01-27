@@ -5,6 +5,7 @@
 \section{Cilk Prefix Sums}
 \pgfplotstableread[format=file,col sep=comma]{../../../data/2-cilk/p1/task-n.processed}\cilktaskn
 \pgfplotstableread[format=file,col sep=comma]{../../../data/2-cilk/p1/data-n.processed}\cilkdatan
+\pgfplotstableread[format=file,col sep=comma]{../../../data/2-cilk/p1/task-speedup.processed}\cilkspeedup
 
 \begin{figure}[h!]
 \centering
@@ -53,6 +54,40 @@
 \end{tikzpicture}
 \caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{data-parallel} and \textbf{task-parallel algorithms} in \textbf{Cilk}. Raw data can be found in the appendix: \autoref{res-tbl:2-data-n} \autoref{res-tbl:2-task-n}}
 \label{plot:2-n}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+	xlabel={Threads},
+	ylabel={Time [s]},
+	%xmode=log, ymode=log,
+	enlarge x limits=false,
+	axis on top,
+	legend transposed =true,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	reverse legend,
+	ymin=0,
+	]
+	\addplot [stack plots=y, fill=none, draw=none, forget plot]		table [x=id, y=min]		{\cilkspeedup} \closedcycle;
+	\addplot [stack plots=y, fill=green, fill opacity=0.4, draw opacity=0, area legend]	table [x=id, y expr=\thisrow{med}-\thisrow{min}]	{\cilkspeedup} \closedcycle;
+	\addplot [stack plots=false, draw=black, thick]					table [x=id, y=med]		{\cilkspeedup};
+	\addplot [stack plots=y, fill=red!50, fill opacity=0.4, draw opacity=0, area legend]table [x=id, y expr=\thisrow{max}-\thisrow{med}]	{\cilkspeedup} \closedcycle;
+
+	\addlegendentry{{below med.}}
+	\addlegendentry{{med.}}
+	\addlegendentry{{above med.}}
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{task-parallel algorithms} in \textbf{Cilk}. Raw data can be found in the appendix: \autoref{res-tbl:2-speedup}}
+\label{plot:2-speedup}
 \end{figure}
 
 \section{MPI Prefix Sums}

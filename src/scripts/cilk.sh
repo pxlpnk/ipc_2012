@@ -2,6 +2,23 @@
 
 . functions.sh
 
+function cilk-task-speedup () {
+	logfile="$GITROOT/data/$dir/task-speedup"
+
+	id=p
+	p=0
+	tries=10
+
+	if [ -n "$BENCHMARK" ]; then
+		algos="task"
+
+		n=`print_power2_seq 20 20`
+		p=`seq 1 48`' '64
+		test_it
+	fi
+	process
+}
+
 function cilk-n () {
 	logfile="$GITROOT/data/$dir/data-n"
 
@@ -50,10 +67,7 @@ if [ -n "$BENCHMARK" ]; then
 	proc_opt="--nproc"
 fi
 
+cilk-task-speedup
 cilk-n
-
-#algos="data task"
-#p=`seq 1 4`
-#n=`seq 1 32`' '`print_power2_seq 5 8`
 
 exit_func
