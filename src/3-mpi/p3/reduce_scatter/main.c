@@ -147,13 +147,20 @@ int main(int argc, char** argv) {
   int rank, size;
   int N;
   char opt;
+  int nt = -1;
+  int max_threads = 16; // on jupiter
+
+  bool id = false;
+
 
   algo_t algo = reduce_scatter;
   FILE *f = NULL;
 
-  static const char optstring[] = "n:a:f:";
+  static const char optstring[] = "n:a:f:i:p:";
   static const struct option long_options[] = {
 		{"n",			1, NULL, 'n'},
+    {"file",		1, NULL, 'f'},
+    {"i",			1, NULL, 'i'},
 		{NULL,			0, NULL, 0}
   };
 
@@ -166,6 +173,20 @@ int main(int argc, char** argv) {
 
 	while ((opt = getopt_long(argc, argv, optstring, long_options, NULL)) != EOF) {
     switch(opt) {
+    case 'i':
+      if (strcmp("procs", optarg) == 0) {
+        id = true;
+      }
+      break;
+    case 'p':
+      nt = atoi(optarg);
+      if (nt > max_threads) {
+        printf("Using too much procs %d, use max %d", nt, max_threads);
+        return EXIT_FAILURE;
+      } else {
+        printf("Using %d procs.", nt);
+      }
+
     case 'n':
       N = atoi(optarg);
       break;    case 'f':
@@ -240,7 +261,6 @@ int main(int argc, char** argv) {
     }
   } else if (algo == reduce_scatter) {
 
-
     if(rank == root){
       debug("Comptuting reference");
       matrix_vector_mult_ref(matrix, vector, N, reference);
@@ -265,8 +285,9 @@ int main(int argc, char** argv) {
     debug("after MPI_Reduce_scatter");
 
 
+  /* TODO: fix test so it uses vector idea  */
     /* debug("Testing result"); */
-    /* if (test_vector_part(result, recvbuff, (rank * partition) , partition)) { */
+    /* if (test_vector_part(result, local_vector, (rank * partition) , partition)) { */
     /*   debug("testresult: OK"); */
     /* } else { */
     /*   debug("testresult: FAILURE"); */
@@ -277,21 +298,34 @@ int main(int argc, char** argv) {
     /* } */
 
     MPI_Barrier(MPI_COMM_WORLD);
-
   }
 
   if (rank == 0) {
-    if (f != NULL)
-      fprintf(f,"%d,%lf\n",N, totaltime);
-    printf("%d,%lf\n",N , totaltime);
+    if (f != NULL) {
+      if (id) {
+        fprintf(f,"%d,%lf\n",nt, totaltime);
+      } else {
+        fprintf(f,"%d,%lf\n",N, totaltime);
+      }
+    }
+    if (id) {
+      printf("%d,%lf\n",nt , totaltime);
+    } else {
+      printf("%d,%lf\n",N , totaltime);
+    }
   }
 
   debug("cleaning up");
+
 
   free(vector);
 
   free(matrix);
 
   MPI_Finalize();
+
+  if ( f != NULL) {
+    fclose(f);
+  }
   return 0;
 }
