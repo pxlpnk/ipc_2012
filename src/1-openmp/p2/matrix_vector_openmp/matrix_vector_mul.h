@@ -6,6 +6,6 @@
 
 void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y);
 
-void matrix_vector_mult(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y);
+void matrix_vector_mult_tiling(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y);
 
 void matrix_vector_mult_false_sharing(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y);

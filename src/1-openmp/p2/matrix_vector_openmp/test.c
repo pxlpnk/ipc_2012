@@ -12,35 +12,12 @@
 
 typedef enum algo {ref, false_sharing, tiling} algo_t;
 
-
-double compute_ref(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *ref_output) {
-
+typedef void (*mat_func_t)(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *ref_output);
+double time_mat_func(mat_func_t f, ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *ref_output) {
   double time = omp_get_wtime();
-  matrix_vector_mult_ref(matrix, vector, n, m, ref_output);
-	time = omp_get_wtime() - time;
-
-  return time;
+  f(matrix, vector, n, m, ref_output);
+	return omp_get_wtime() - time;
 }
-
-double compute_false_sharing(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
-
-  double time = omp_get_wtime();
-  matrix_vector_mult_false_sharing(matrix, vector, n, m, output);
-  time = omp_get_wtime() - time;
-
-  return time;
-}
-
-double compute_tiling_outer_loop(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *output) {
-
-  double time = omp_get_wtime();
-  matrix_vector_mult(matrix, vector, n, m, output);
-  time = omp_get_wtime() - time;
-
-  return time;
-}
-
-
 
 int main (int argc, char *argv[]) {
   uint n = -1;
@@ -98,9 +75,10 @@ int main (int argc, char *argv[]) {
         printf( "Using false_sharing implementation\n");
         algo = false_sharing;
       } else if ((strcmp("tiling", optarg) == 0)) {
-        printf("Using tiling implementation \n");
+        printf("Using tiling implementation\n");
         algo = tiling;
-      }
+      } else
+        printf("Using default implementation\n");
       break;
     default:
       return  EXIT_FAILURE;
@@ -172,21 +150,24 @@ int main (int argc, char *argv[]) {
     vector[i]=i+m;
   }
 
-
-  if (algo == ref ){
-    printf("reference:\n");
-    mtime = compute_ref(matrix, vector, n, m, ref_output);
-    printf("%lf seconds.\n",mtime);
-  } else if (algo == false_sharing) {
-    compute_ref(matrix, vector, n, m, ref_output);
-    printf("No of cpus: %d\n", nt);
-    omp_set_num_threads(nt);
-    mtime = compute_false_sharing(matrix, vector, n, m, product);
-  } else if (algo == tiling) {
-    compute_ref(matrix, vector, n, m, ref_output);
-    printf("No of cpus: %d\n", nt);
-    omp_set_num_threads(nt);
-    mtime =  compute_tiling_outer_loop(matrix, vector, n, m, product);
+  switch(algo) {
+    case ref:
+      printf("reference:\n");
+      mtime = time_mat_func(&matrix_vector_mult_ref, matrix, vector, n, m, ref_output);
+      printf("%lf seconds.\n",mtime);
+      break;
+    case false_sharing:
+      matrix_vector_mult_ref(matrix, vector, n, m, ref_output);
+      printf("No of cpus: %d\n", nt);
+      omp_set_num_threads(nt);
+      mtime = time_mat_func(&matrix_vector_mult_false_sharing, matrix, vector, n, m, ref_output);
+      break;
+    case tiling:
+      matrix_vector_mult_ref(matrix, vector, n, m, ref_output);
+      printf("No of cpus: %d\n", nt);
+      omp_set_num_threads(nt);
+      mtime = time_mat_func(&matrix_vector_mult_tiling, matrix, vector, n, m, ref_output);
+      break;
   }
 
 
