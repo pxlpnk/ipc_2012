@@ -162,15 +162,15 @@ int main (int argc, char *argv[]) {
       break;
     case false_sharing:
       matrix_vector_mult_ref(matrix, vector, n, m, ref_output);
-      printf("No of cpus: %d\n", nt);
+      printf("false sharing - No of cpus: %d\n", nt);
       omp_set_num_threads(nt);
-      mtime = time_mat_func(&matrix_vector_mult_false_sharing, matrix, vector, n, m, ref_output);
+      mtime = time_mat_func(&matrix_vector_mult_false_sharing, matrix, vector, n, m, product);
       break;
     case tiling:
       matrix_vector_mult_ref(matrix, vector, n, m, ref_output);
-      printf("No of cpus: %d\n", nt);
+      printf("tiling - No of cpus: %d\n", nt);
       omp_set_num_threads(nt);
-      mtime = time_mat_func(&matrix_vector_mult_tiling, matrix, vector, n, m, ref_output);
+      mtime = time_mat_func(&matrix_vector_mult_tiling, matrix, vector, n, m, product);
       break;
   }
 
