@@ -79,23 +79,24 @@ def usage
 end
 
 def prepare_data( files )
-  @hash = Hash.new{|h, k| h[k] = []}
+  hash = Hash.new{|h, k| h[k] = []}
   file_counter = 0
   files.each do |file|
     CSV.foreach(file) do |threads,time|
-      @hash[threads.to_i] <<  time.to_f unless threads.nil?
+      hash[threads.to_i] <<  time.to_f unless threads.nil?
     end
     file_counter += 1
   end
 
-  @hash
+  hash
 end
 
 
 def aggregate(data, fn)
-  computed = []
+  computed = Hash.new{|h, k| h[k] = []}
+
   data.each do |k,dat|
-    computed[k] = dat.send(fn)
+    computed[k] << dat.send(fn)
   end
 
   computed
@@ -106,9 +107,11 @@ def header(field="id")
   "#{field},min,max,avg,med"
 end
 
+
 def get_elem(elem, data)
-   [elem, data[:min][elem], data[:max][elem], data[:mean][elem], data[:median][elem]]
+   [elem, data[:min][elem].first, data[:max][elem].first, data[:mean][elem].first, data[:median][elem].first]
 end
+
 
 def compute_indices(data)
     computed = []
