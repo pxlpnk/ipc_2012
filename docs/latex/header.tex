@@ -72,8 +72,8 @@
 \definecolor{lightgray}{gray}{0.9}
 \usepackage{multirow}
 %\usepackage{rotating}
-\usepackage{pdflscape}
-\usepackage{diagbox}
+%\usepackage{pdflscape}
+%\usepackage{diagbox}
 %\usepackage{footnote}
 %\usepackage{datatool}
 %\renewcommand{\thempfootnote}{\arabic{mpfootnote}} % arabic footnotes in minipages
@@ -81,6 +81,15 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.5.1}
 \usepackage{pgfplotstable}
+
+\makeatletter
+\newcommand\resetstackedplots{
+\makeatletter
+\pgfplots@stacked@isfirstplottrue
+\makeatother
+\addplot [forget plot,draw=none] coordinates{(1,0) (2,0) (3,0)} \closedcycle;
+}
+\makeatother
 
 % source code listings
 %\usepackage{listings}
@@ -126,11 +135,6 @@
 \makeoddfoot{plain}{}{}{\thepage}
 \aliaspagestyle{chapter}{numberCorner}
 
-%\usepackage{TUINFDA} % tu template style
-\newcommand{\thesiskeywords}{Masters's thesis} % default keywords
-
-\InputIfFileExists{private}{}{} % defines macros like thesis title etc. mainly used on the titlepages
-
 \usepackage[stable,norule,multiple,marginal]{footmisc} % für footnotes in section headers, aber nicht in toc etc.
 \makeatletter
 \renewcommand\@makefntext[1]{\leftskip=3em\hskip-2em\@makefnmark~#1%
@@ -170,19 +174,19 @@
 	%hyperfootnotes=false,
 }
 \usepackage[all]{hypcap} % fix caption anchors
-\renewcommand{\backreflastsep}{, } % does not work (yet?)
-\renewcommand*{\backref}[1]{} % default interface disabled
-\renewcommand*{\backrefalt}[4]{%
+%\renewcommand{\backreflastsep}{, } % does not work (yet?)
+%\renewcommand*{\backref}[1]{} % default interface disabled
+%\renewcommand*{\backrefalt}[4]{%
 	%1. Number of citations without dupes.
 	%2. Back references list without dupes.
 	%3. Number of all citations (with dupes).
 	%4. Back reference list with all entries (with dupes).
-	Cited on page%
-	\ifnum#1>1 %
-		s%
-	\fi %
-	{:} #2{.}
-}
+	%Cited on page%
+	%\ifnum#1>1 %
+		%s%
+	%\fi %
+	%{:} #2{.}
+%}
 
 %\usepackage[
 	%shortcuts,

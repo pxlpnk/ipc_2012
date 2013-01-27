@@ -54,7 +54,9 @@ Stefan Tauner \small 0427514, 938 \\
 %\listoffigures
 %\listoftables
 
-\input{chapters/1}
+\pgfkeys{/pgf/number format/set thousands separator={,}}
+%\input{chapters/1}
+\input{chapters/prefix}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%   APPENDIX    %%%%%%%%%%%%%%%%%%%%%%%
@@ -63,6 +65,7 @@ Stefan Tauner \small 0427514, 938 \\
 \cleardoublepage % ensures that even pages are left and odd pages are right *sigh*
 \pagenumbering{Roman}
 \appendix
+\input{chapters/tables}
 
 %\bibliography{bibliography}	% file names without ending
 
