@@ -14,6 +14,9 @@ function test_it () {
 		echo "missing parameter"
 		exit 1
 	fi
+	if [ -n "$CLEAN" ]; then
+		rm -f "$logfile"
+	fi
 	for alg in $algos; do
 		for N in $n; do
 			for NPROC in $p; do
@@ -37,6 +40,9 @@ function process () {
 	if [ -z "$SCRIPTDIR" -o -z "$logfile" ]; then
 		echo "missing parameter"
 		exit 1
+	fi
+	if [ -n "$CLEAN" ]; then
+		rm -f "$logfile.processed"
 	fi
 	echo -n "processing '"$logfile"'... "
 	"$SCRIPTDIR/stats.rb" "$logfile" > "$logfile".processed
@@ -64,7 +70,7 @@ function cilk () {
 		algos="data"
 		p=0
 		#n=`print_power2_seq 2 4`
-		n=`seq 1 32`' '`print_power2_seq 5 8`
+		n=`seq 1 32`' '`print_power2_seq 5 28`
 		id=n
 		test_it
 	fi
@@ -75,21 +81,42 @@ function cilk () {
 	#n=`seq 1 32`' '`print_power2_seq 5 8`
 }
 
-# http://stackoverflow.com/a/246128/1905491
 OCWD=`pwd`
+# http://stackoverflow.com/a/246128/1905491
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TIMESTAMP=`date "+%Y%m%d-%H%M"`
 GITROOT=`git rev-parse --show-toplevel`
 
+function usage () {
+cat << EOF
+usage: $0 [-h | [-b] [-c]]
+
+This script runs benchmarks and processes the results
+
+OPTIONS:
+    -h      Show this message
+    -b      Run the benchmarks
+    -c      Clean previous logs that will be regenerated later in this run
+EOF
+}
+
 BENCHMARK=
-while getopts "b" OPTION ; do
+while getopts "bch" OPTION ; do
 	case $OPTION in
-	  #t)
+	h)
+		usage
+		exit 0
+		;;
+	#t)
 		  #TEST=$OPTARG
 		  #;;
-	  b)
+	b)
 		  BENCHMARK=BENCHMARK
 		  echo "Will run benchmarks"
+		  ;;
+	c)
+		  CLEAN=CLEAN
+		  echo "Will clean previous logs"
 		  ;;
 	esac
 done
