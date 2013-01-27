@@ -2,10 +2,15 @@
 #include <stdio.h>
 #include <omp.h>
 #include <string.h>
+#include <getopt.h>
+#include <errno.h>
+
 
 
 
 #include "matrix_vector_mul.h"
+
+typedef enum algo {ref, false_sharing, tiling} algo_t;
 
 
 double compute_ref(ATYPE **matrix, ATYPE *vector,uint n, uint m, ATYPE *ref_output) {
@@ -38,11 +43,71 @@ double compute_tiling_outer_loop(ATYPE **matrix, ATYPE *vector,uint n, uint m, A
 
 
 int main (int argc, char *argv[]) {
-  uint n = 400;
-  uint m = 4000;
+  uint n = -1;
+  uint m = -1;
   uint max_threads = omp_get_max_threads();
   uint nt = max_threads;
   double mtime = 0.0;
+  char opt;
+
+  algo_t algo = tiling;
+  FILE *f = NULL;
+	static const char optstring[] = "p:n:m:a:f:";
+  static const struct option long_options[] = {
+		{"n",			1, NULL, 'n'},
+    {"file",		1, NULL, 'f'},
+		{NULL,			0, NULL, 0},
+  };
+
+	while ((opt = getopt_long(argc, argv, optstring, long_options, NULL)) != EOF) {
+    switch(opt) {
+    case 'p':
+      nt = atoi(optarg);
+      if (nt > max_threads) {
+        printf("Using too much procs %d, use max %d", nt, max_threads);
+        return EXIT_FAILURE;
+      } else {
+        printf("Using %d procs.", nt);
+      }
+      break;
+    case 'n':
+      n = atoi(optarg);
+      break;
+    case 'm':
+      m = atoi(optarg);
+      break;
+    case 'f':
+			f = fopen(optarg,"a");
+			if (f == NULL) {
+				printf("Could not open log file '%s': %s\n", optarg, strerror(errno));
+				return  EXIT_FAILURE;
+			}
+			break;
+    case 'a':
+      if (strcmp("ref", optarg) == 0) {
+        printf("Using reference implementation \n");
+        algo = ref;
+      } else if ((strcmp("false_sharing", optarg) == 0)) {
+        printf( "Using false_sharing implementation \n");
+        algo = false_sharing;
+      } else if ((strcmp("tiling", optarg) == 0)) {
+        printf("Using false_sharing implementation \n");
+        algo = tiling;
+      }
+      break;
+    default:
+      return  EXIT_FAILURE;
+    }
+  }
+
+  if( n == -1 && m != -1) {
+    printf("No n given using m");
+    n = m;
+  } else if (n != -1 && m == -1) {
+    printf("No m given using n");
+    m = n;
+  }
+
 
   printf("setting up data structures\n");
 
@@ -50,13 +115,6 @@ int main (int argc, char *argv[]) {
   ATYPE *vector = NULL;
   ATYPE *product = NULL;
   ATYPE *ref_output = NULL;
-
-  char *timestamp = time_stamp();
-
-  // file handles
-
-  FILE *false_sharing, *tiling, *reference;
-  char *mode = "w+";
 
 
   // matrix
@@ -108,75 +166,41 @@ int main (int argc, char *argv[]) {
   }
 
 
-  printf("\nStarting computation: %s \n",timestamp);
-
-
-  char reference_filename[50];
-  strcpy(reference_filename, "data/reference_");
-  strcat(reference_filename, timestamp) ;
-
-  reference = fopen(reference_filename,"a+");
-
-  char fs_filename[50];
-  strcpy(fs_filename, "data/false_sharing_");
-  strcat(fs_filename, timestamp) ;
-
-  false_sharing = fopen(fs_filename,"a+");
-
-  char tiling_filename[50];
-  strcpy(tiling_filename, "data/tiling_");
-  strcat(tiling_filename, timestamp) ;
-
-  tiling = fopen(tiling_filename,"a+");
-
-  printf("reference:\n");
-  mtime = compute_ref(matrix, vector, n, m, ref_output);
-  printf("%lf seconds.\n",mtime);
-
-  fprintf(reference,"%d,%lf\n",1,mtime);
-
-
-
-  for(uint i = 1; i<= nt; i++) {
-    printf("No of cpus: %d\n", i);
-
-    omp_set_num_threads(i);
-
-    printf("tiling outer loop(false_sharing):\n");
+  if (algo == ref ){
+    printf("reference:\n");
+    mtime = compute_ref(matrix, vector, n, m, ref_output);
+    printf("%lf seconds.\n",mtime);
+  } else if (algo == false_sharing) {
+    compute_ref(matrix, vector, n, m, ref_output);
+    printf("No of cpus: %d\n", nt);
+    omp_set_num_threads(nt);
     mtime = compute_false_sharing(matrix, vector, n, m, product);
-    printf("%lf seconds.\n",mtime);
-
-    fprintf(false_sharing,"%d,%lf\n",i,mtime);
-
-
-#ifdef DBG
-    if ( !testResult(product, ref_output, n)) {
-      printf("=======> Wrong result\n");
-      return 1;
-    }
-#endif
-
-    free(product);
-    product = (ATYPE *) malloc(sizeof(ATYPE) *n);
-    if(product == NULL) {
-      fprintf(stderr,"Out of memory\n");
-      return 1;
-    }
-
-    printf("tiling outer loop propper:\n");
-    mtime = compute_tiling_outer_loop(matrix, vector, n, m, product);
-    printf("%lf seconds.\n",mtime);
-
-    fprintf(tiling,"%d,%lf\n",i,mtime);
-
-#ifdef DBG
-    if ( !testResult(product, ref_output, n)) {
-      printf("=======> Wrong result\n");
-      return 1;
-    }
-#endif
-
+  } else if (algo == tiling) {
+    compute_ref(matrix, vector, n, m, ref_output);
+    printf("No of cpus: %d\n", nt);
+    omp_set_num_threads(nt);
+    mtime =  compute_tiling_outer_loop(matrix, vector, n, m, product);
   }
+
+
+  if (f != NULL) {
+    fprintf(f,"%dx%d,%lf\n",n,m, mtime);
+  }
+
+  printf("%dx%d,%lf\n",n,m , mtime);
+
+
+#ifdef DBG
+  if ( !testResult(product, ref_output, n) && algo != ref ) {
+    printArray(product, n);
+    printArray(ref_output,n);
+    printf("=======> Wrong result\n");
+    return 1;
+  }
+#endif
+
+
+
   // cleaning up
   free(vector);
   for(int i=0; i<n; i++) {
@@ -186,7 +210,6 @@ int main (int argc, char *argv[]) {
   free(matrix);
   free(ref_output);
   free(product);
-  fclose(false_sharing);
-  fclose(tiling);
+  fclose(f);
 
 }
