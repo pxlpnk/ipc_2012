@@ -304,6 +304,8 @@ int main(int argc, char *argv[]) {
 
 	free(cor);
 	free(arr);
+	if (f != NULL)
+		fclose(f);
 
 	return ret;
 }
