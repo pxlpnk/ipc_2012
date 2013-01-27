@@ -85,10 +85,10 @@ int main (int argc, char *argv[]) {
 			break;
     case 'a':
       if (strcmp("ref", optarg) == 0) {
-        printf("Using reference implementation \n");
+        printf("Using reference implementation\n");
         algo = ref;
       } else if ((strcmp("false_sharing", optarg) == 0)) {
-        printf( "Using false_sharing implementation \n");
+        printf( "Using false_sharing implementation\n");
         algo = false_sharing;
       } else if ((strcmp("tiling", optarg) == 0)) {
         printf("Using false_sharing implementation \n");
@@ -101,10 +101,10 @@ int main (int argc, char *argv[]) {
   }
 
   if( n == -1 && m != -1) {
-    printf("No n given using m");
+    printf("No n given using m\n");
     n = m;
   } else if (n != -1 && m == -1) {
-    printf("No m given using n");
+    printf("No m given using n\n");
     m = n;
   }
 
