@@ -28,10 +28,10 @@ clean:
 
 $(TEX_OUT): *.tex chapters/*tex *.bib
 	$(TEX) $(TEX_MAIN)
-	$(BIB) $(OUTDIR)$(JOB)
+	#$(BIB) $(OUTDIR)$(JOB)
 	#$(IDX) $(OUTDIR)$(JOB).idx
 	#$(ACR) $(OUTDIR)$(JOB)
-	$(TEX) $(TEX_MAIN)
+	#$(TEX) $(TEX_MAIN)
 	#$(ACR) $(OUTDIR)$(JOB)
 	$(TEX) $(TEX_MAIN)
 
