@@ -18,3 +18,5 @@
 
 # Latex
 output/
+
+*.processed
