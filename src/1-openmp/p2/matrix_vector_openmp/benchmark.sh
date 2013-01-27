@@ -39,7 +39,7 @@ do
     do
         for n in "${N[@]}"
         do
-            data_file="${data_dir}/${algo}_fixed_m_${M}}"
+            data_file="${data_dir}/${algo}_fixed_m_${M}"
             ./p2-matrix_vector_openmp.exe -p $PROCS -a $algo -m $m -n $N -f $data_file
         done
     done
@@ -47,7 +47,7 @@ done
 
 
 M=1000
-N=1000000
+N=100000
 PROCS=2
 algos=( ref false_sharing tiling )
 
@@ -66,7 +66,7 @@ done
 
 
 N=1000
-M=1000000
+M=100000
 PROCS=2
 algos=( ref false_sharing tiling )
 
