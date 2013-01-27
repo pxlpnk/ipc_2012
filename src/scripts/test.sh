@@ -103,13 +103,13 @@ EOF
 BENCHMARK=
 while getopts ":bch" OPTION ; do
 	case $OPTION in
-	?)
+	'?')
 		echo  ------------------------
 		echo "Error: unknown option: $OPTARG"
 		echo  ------------------------
 		echo
 		usage
-		exit 0
+		exit 1
 		;;
 	h)
 		usage
