@@ -9,6 +9,26 @@ function print_power2_seq () { # print 2^$1 till 2^$2 (inclusive)
 	done
 }
 
+function print_rand_seq () { # print $rnd_times times 2^<random> <= 2^$rnd_exp, seeded by $rnd_seed
+	if [ -z "$rnd_seed" -o -z "$rnd_times" -o -z "$rnd_exp" ]; then
+		echo "missing parameter"
+		exit 1
+	fi
+	RANDOM=$rnd_seed
+	limit=1
+	for i in `seq 1 $rnd_exp`; do
+		limit=$(($limit*2))
+	done
+	for i in `seq 1 $rnd_times`; do
+		number=$RANDOM
+		while [[ $number -le $limit ]]; do
+			number=$(($number*2))
+		done
+		let "number %= $limit"
+		echo -n "$number "
+	done
+}
+
 function test_it () {
 	if [ -z "$tries" -o -z "$app" -o -z "$proc_opt" -o -z "$algos" -o -z "$p" -o -z "$n" -o -z "$logfile" ]; then
 		echo "missing parameter"
