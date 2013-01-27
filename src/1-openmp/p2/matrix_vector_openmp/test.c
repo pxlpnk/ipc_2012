@@ -49,18 +49,25 @@ int main (int argc, char *argv[]) {
   uint nt = max_threads;
   double mtime = 0.0;
   char opt;
+  bool id = false;
 
   algo_t algo = tiling;
   FILE *f = NULL;
-	static const char optstring[] = "p:n:m:a:f:";
+	static const char optstring[] = "p:n:m:a:f:i:";
   static const struct option long_options[] = {
 		{"n",			1, NULL, 'n'},
     {"file",		1, NULL, 'f'},
+    {"i",		1, NULL, 'i'},
 		{NULL,			0, NULL, 0},
   };
 
 	while ((opt = getopt_long(argc, argv, optstring, long_options, NULL)) != EOF) {
     switch(opt) {
+    case 'i':
+      if (strcmp("procs", optarg) == 0) {
+        id = true;
+      }
+      break;
     case 'p':
       nt = atoi(optarg);
       if (nt > max_threads) {
@@ -91,7 +98,7 @@ int main (int argc, char *argv[]) {
         printf( "Using false_sharing implementation\n");
         algo = false_sharing;
       } else if ((strcmp("tiling", optarg) == 0)) {
-        printf("Using false_sharing implementation \n");
+        printf("Using tiling implementation \n");
         algo = tiling;
       }
       break;
@@ -183,11 +190,19 @@ int main (int argc, char *argv[]) {
   }
 
 
-  if (f != NULL) {
-    fprintf(f,"%dx%d,%lf\n",n,m, mtime);
-  }
 
-  printf("%dx%d,%lf\n",n,m , mtime);
+  if (f != NULL) {
+    if (id) {
+      fprintf(f,"%d,%lf\n",nt, mtime);
+    } else {
+      fprintf(f,"%dx%d,%lf\n",n,m, mtime);
+    }
+  }
+  if (id) {
+    printf("%d,%lf\n",nt, mtime);
+  } else {
+    printf("%dx%d,%lf\n",n,m , mtime);
+  }
 
 
 #ifdef DBG
