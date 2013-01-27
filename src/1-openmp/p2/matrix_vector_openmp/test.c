@@ -210,6 +210,7 @@ int main (int argc, char *argv[]) {
   free(matrix);
   free(ref_output);
   free(product);
-  fclose(f);
+  if (f != NULL)
+    fclose(f);
 
 }
