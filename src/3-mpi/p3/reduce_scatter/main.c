@@ -280,11 +280,15 @@ int main(int argc, char** argv) {
     MPI_Barrier(MPI_COMM_WORLD);
     inittime = MPI_Wtime();
     compute_reduce_scatter(local_matrix, local_vector, result, rank, size, N, partition);
+
     MPI_Barrier(MPI_COMM_WORLD);
+
     totaltime = MPI_Wtime() - inittime;
+    double localtime = totaltime;
+
+    MPI_Reduce(&localtime, &totaltime, 1, MPI_DOUBLE, MPI_MAX, root,  MPI_COMM_WORLD);
+
     debug("after MPI_Reduce_scatter");
-
-
   /* TODO: fix test so it uses vector idea  */
     /* debug("Testing result"); */
     /* if (test_vector_part(result, local_vector, (rank * partition) , partition)) { */

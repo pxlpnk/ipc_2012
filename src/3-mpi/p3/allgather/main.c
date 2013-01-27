@@ -12,11 +12,6 @@
 #define root 0
 
 typedef enum algo {ref, allgather} algo_t;
-static const char *algo2str[] = {
-	"ref",
-	"allgather"
-};
-
 
 
 void matrix_vector_mult_ref(ATYPE **x, ATYPE *a, uint n, uint m, ATYPE *y) {
@@ -158,7 +153,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  double       inittime,totaltime;
+  double  inittime = -1,totaltime = -1;
 
   if( algo == ref) {
     if (rank == root) {
@@ -191,7 +186,6 @@ int main(int argc, char** argv) {
       }
     }
 
-
     debug("begin MPI_Allgather");
 
     inittime = MPI_Wtime();
@@ -201,6 +195,10 @@ int main(int argc, char** argv) {
                   MPI_COMM_WORLD);
 
     totaltime = MPI_Wtime() - inittime;
+    double mytime = totaltime;
+
+    MPI_Reduce(&mytime, &totaltime, 1, MPI_DOUBLE, MPI_MAX, root,  MPI_COMM_WORLD);
+
     MPI_Barrier(MPI_COMM_WORLD);
     debug("after MPI_Allgather");
 
