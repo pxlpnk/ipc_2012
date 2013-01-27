@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
   int rank, size, N;
   char opt;
 
+
   algo_t algo = allgather;
   FILE *f = NULL;
 	static const char optstring[] = "n:a:f:";
@@ -203,8 +204,8 @@ int main(int argc, char** argv) {
   }
   if (rank == 0) {
     if (f != NULL)
-      fprintf(f,"%d,%lf\n", N, totaltime);
-    printf("%d,%lf\n", N , totaltime);
+      fprintf(f,"%d,%lf\n",N, totaltime);
+    printf("%d,%lf\n",N , totaltime);
   }
 
 
@@ -216,7 +217,7 @@ int main(int argc, char** argv) {
   }
 
   free(matrix);
- out_mpi:
+
   MPI_Finalize();
 	if (f != NULL)
 		fclose(f);
