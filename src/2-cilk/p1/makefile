@@ -16,7 +16,9 @@ OBJS = $(SRCS:%.c=%.o)
 CILKDSRCS := \
 	$(wildcard *.cilk)
 
-all: $(EXE)
+all: fast
+
+fast: $(EXE)
 
 debug: CFLAGS += -DDBG -g
 debug: $(EXE)
@@ -27,4 +29,4 @@ debug: $(EXE)
 clean:
 	rm -rf $(EXE) $(OBJS)
 
-.PHONY = clean all
+.PHONY = clean all debug fast
