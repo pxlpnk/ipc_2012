@@ -5,13 +5,18 @@ CWD := $(shell pwd)
 CC ?= gcc
 P := $(shell dirname $(CWD))
 EXE ?= $(shell basename $(P))-$(shell basename $(CWD)).exe
-CFLAGS ?= -fopenmp -Wall -O3 -std=gnu99 -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT) -DDBG
+CFLAGS ?= -fopenmp -Wall -pedantic -O3 -std=gnu99 -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT)
 SRCS := \
 	$(wildcard ../../../shared/*.c) \
 	$(wildcard *.c)
 OBJS = $(SRCS:%.c=%.o)
 
-all: $(EXE)
+all: debug
+
+fast: $(EXE)
+
+debug: CFLAGS += -DDBG -g
+debug: $(EXE)
 
 .PRECIOUS : $(OBJS)
 %.exe: $(OBJS)
@@ -23,4 +28,4 @@ all: $(EXE)
 clean:
 	rm -rf $(EXE) $(OBJS)
 
-.PHONY = clean all
+.PHONY = clean all fast debug
