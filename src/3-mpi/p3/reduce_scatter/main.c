@@ -4,10 +4,14 @@
 // MPI header
 #include <mpi.h>
 #include <getopt.h>
+#include <errno.h>
+
 #include "util.h"
 #include "main.h"
 
 #define root 0
+
+typedef enum algo {ref, reduce_scatter} algo_t;
 
 
 void matrix_vector_mult_ref(ATYPE *x, ATYPE *a, uint n, ATYPE *y) {
@@ -144,6 +148,9 @@ int main(int argc, char** argv) {
   int N;
   char opt;
 
+  algo_t algo = reduce_scatter;
+  FILE *f = NULL;
+
   static const char optstring[] = "n:a:f:";
   static const struct option long_options[] = {
 		{"n",			1, NULL, 'n'},
@@ -161,7 +168,26 @@ int main(int argc, char** argv) {
     switch(opt) {
     case 'n':
       N = atoi(optarg);
+      break;    case 'f':
+			f = fopen(optarg,"a");
+			if (f == NULL) {
+				mpi_printf(root, "Could not open log file '%s': %s\n", optarg, strerror(errno));
+        MPI_Finalize();
+				return  EXIT_FAILURE;
+			}
+			break;
+    case 'a':
+      if (strcmp("ref", optarg) == 0) {
+        mpi_printf(root, "Using reference implementation \n");
+        algo = ref;
+      } else if ((strcmp("reduce_scatter", optarg) == 0)) {
+        mpi_printf(root, "Using MPI_Allgather implementation \n");
+        algo = reduce_scatter;
+      }
       break;
+    default:
+      MPI_Finalize();
+      return  EXIT_FAILURE;
     }
   }
 
@@ -204,47 +230,60 @@ int main(int argc, char** argv) {
   ATYPE *result = NULL;
   result = init_vector(N,1);
 
-  if(rank == root){
-    debug("Comptuting reference");
-    matrix_vector_mult_ref(matrix, vector, N, reference);
-  }
-
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  /* ======================================================== */
-  /* distributing matrix and vector */
-
-
-  distribute_vector(vector, local_vector, rank, size, partition, N);
-  distribute_matrix(matrix, local_matrix, rank, size, partition, N);
-
   double       inittime,totaltime;
 
-  debug("begin MPI_Reduce_scatter");
-  MPI_Barrier(MPI_COMM_WORLD);
-  inittime = MPI_Wtime();
-  compute_reduce_scatter(local_matrix, local_vector, result, rank, size, N, partition);
-  MPI_Barrier(MPI_COMM_WORLD);
-  totaltime = MPI_Wtime() - inittime;
-  debug("after MPI_Reduce_scatter");
+  if( algo == ref) {
+    if (rank == root) {
+      inittime = MPI_Wtime();
+      matrix_vector_mult_ref(matrix, vector, N, reference);
+      totaltime = MPI_Wtime() - inittime;
+    }
+  } else if (algo == reduce_scatter) {
 
 
-  /* debug("Testing result"); */
-  /* if (test_vector_part(result, recvbuff, (rank * partition) , partition)) { */
-  /*   debug("testresult: OK"); */
-  /* } else { */
-  /*   debug("testresult: FAILURE"); */
-  /*   debug("Result:"); */
-  /*   printArray(recvbuff, N); */
-  /*   debug("Reference:"); */
-  /*   printArray(reference,N); */
-  /* } */
+    if(rank == root){
+      debug("Comptuting reference");
+      matrix_vector_mult_ref(matrix, vector, N, reference);
+    }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    /* ======================================================== */
+    /* distributing matrix and vector */
 
 
-  if(rank == 0) {
-    printf("%d,%f\n",N, totaltime);
+    distribute_vector(vector, local_vector, rank, size, partition, N);
+    distribute_matrix(matrix, local_matrix, rank, size, partition, N);
+
+
+    debug("begin MPI_Reduce_scatter");
+    MPI_Barrier(MPI_COMM_WORLD);
+    inittime = MPI_Wtime();
+    compute_reduce_scatter(local_matrix, local_vector, result, rank, size, N, partition);
+    MPI_Barrier(MPI_COMM_WORLD);
+    totaltime = MPI_Wtime() - inittime;
+    debug("after MPI_Reduce_scatter");
+
+
+    /* debug("Testing result"); */
+    /* if (test_vector_part(result, recvbuff, (rank * partition) , partition)) { */
+    /*   debug("testresult: OK"); */
+    /* } else { */
+    /*   debug("testresult: FAILURE"); */
+    /*   debug("Result:"); */
+    /*   printArray(recvbuff, N); */
+    /*   debug("Reference:"); */
+    /*   printArray(reference,N); */
+    /* } */
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+  }
+
+  if (rank == 0) {
+    if (f != NULL)
+      fprintf(f,"%d,%lf\n",N, totaltime);
+    printf("%d,%lf\n",N , totaltime);
   }
 
   debug("cleaning up");
