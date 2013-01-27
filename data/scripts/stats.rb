@@ -83,7 +83,7 @@ def prepare_data( files )
   file_counter = 0
   files.each do |file|
     CSV.foreach(file) do |threads,time|
-      @hash[threads.to_i][file_counter] = time.to_f unless threads.nil?
+      @hash[threads.to_i] <<  time.to_f unless threads.nil?
     end
     file_counter += 1
   end
@@ -91,16 +91,6 @@ def prepare_data( files )
   @hash
 end
 
-
-def prepare_data_single_file(file)
-  file = file.first
-  @hash = Hash.new{|h, k| h[k] = []}
-  CSV.foreach(file) do |threads,time|
-    @hash[threads.to_i] << time.to_f unless threads.nil?
-  end
-
-  @hash
-end
 
 def aggregate(data, fn)
   computed = []
@@ -142,11 +132,8 @@ if __FILE__ == $0
     exit
   end
 
-  if @files.size == 1
-    data = prepare_data_single_file(@files)
-  else
-    data = prepare_data(@files)
-  end
+  data = prepare_data(@files)
+
   indices = compute_indices(data)
 
   functions = [:max, :min, :mean, :median]
