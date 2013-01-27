@@ -10,6 +10,12 @@
 
 void EXPORT(datapara) (CilkContext *const ctx, ATYPE a[], uint n, uint t);
 void EXPORT(rec) (CilkContext *const ctx, ATYPE *a[], uint n);
+uint EXPORT(get_proc_count) (CilkContext *const ctx);
+
+cilk uint get_proc_count() {
+	printf("Cilk_active_size = %d\n", Cilk_active_size);
+	return Cilk_active_size;
+}
 
 cilk void inplace_double(ATYPE arr[], uint n, uint k) {
 	uint i;
@@ -201,12 +207,7 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Warning: Extra parameters found.\n");
 	}
 
-	if (t == 0){
-		fprintf(stderr, "Number of threads required!\n");
-		usage_abort();
-	}
-
-	if (n == 0){
+	if (n == 0) {
 		fprintf(stderr, "Legal array size n required!\n");
 		usage_abort();
 	}
@@ -214,6 +215,8 @@ int main(int argc, char *argv[]) {
 	ctx = Cilk_init(&argc, argv);
 	if(ctx == NULL)
 		return EXIT_FAILURE;
+
+	n = EXPORT(get_proc_count)(ctx);
 
 	arr = malloc(sizeof(ATYPE) * n);
 	if (arr == NULL)
