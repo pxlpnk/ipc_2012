@@ -134,7 +134,7 @@ if __FILE__ == $0
 
   data = prepare_data(@files)
 
-  indices = compute_indices(data)
+  indices = compute_indices(data).sort
 
   functions = [:max, :min, :mean, :median]
   output = {}
