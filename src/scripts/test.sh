@@ -101,8 +101,16 @@ EOF
 }
 
 BENCHMARK=
-while getopts "bch" OPTION ; do
+while getopts ":bch" OPTION ; do
 	case $OPTION in
+	?)
+		echo  ------------------------
+		echo "Error: unknown option: $OPTARG"
+		echo  ------------------------
+		echo
+		usage
+		exit 0
+		;;
 	h)
 		usage
 		exit 0
