@@ -126,8 +126,9 @@ int main(int argc, char *argv[])
 
 	arrayscan(arr, n, rank, size, comm, algo);
 
-	MPI_Barrier(comm);
 	double totaltime = MPI_Wtime() - inittime;
+	double mytime = totaltime;
+	MPI_Reduce(&mytime, &totaltime, 1, MPI_DOUBLE, MPI_MAX, root, comm);
 
 	/* gather results at root node */
 	if (rank == root) {
