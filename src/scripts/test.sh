@@ -37,6 +37,7 @@ function test_it () {
 	if [ -n "$CLEAN" ]; then
 		rm -f "$logfile"
 	fi
+	mkdir -p `dirname "$logfile"`
 	for alg in $algos; do
 		for N in $n; do
 			for NPROC in $p; do
