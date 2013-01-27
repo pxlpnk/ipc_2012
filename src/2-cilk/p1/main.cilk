@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
 		case 'i':
 			if (strcmp(optarg, "a") == 0)
 				id = alg;
-			else if (strcmp(optarg, "t") == 0)
+			else if (strcmp(optarg, "p") == 0)
 				id = proc;
 			else if (strcmp(optarg, "n") == 0)
 				id = en;
