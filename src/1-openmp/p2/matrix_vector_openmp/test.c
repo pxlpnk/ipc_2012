@@ -93,6 +93,10 @@ int main (int argc, char *argv[]) {
     m = n;
   }
 
+  if (n == -1 || m == -1) {
+    printf("Either m or n could not be derived, aborting.\n");
+    return 1;
+  }
 
   printf("setting up data structures\n");
 
