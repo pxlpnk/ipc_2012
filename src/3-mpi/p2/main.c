@@ -6,10 +6,11 @@
 #include <mpi.h>
 #include "util.h"
 
-typedef enum algo {native, custom} algo_t;
+typedef enum algo {native, custom, seq} algo_t;
 static const char *algo2str[] = {
 	"native",
-	"custom"
+	"custom",
+	"seq",
 };
 
 void arrayscan(ATYPE A[], uint n, int rank, int size, MPI_Comm comm, algo_t algo) {
@@ -104,6 +105,9 @@ int main(int argc, char *argv[])
 			} else if (strcmp("custom", optarg) == 0) {
 				mpi_printf(root, "Using custom implementation of Exscan\n");
 				algo = custom;
+			} else if (strcmp("seq", optarg) == 0) {
+				mpi_printf(root, "Using sequential implementation of Exscan\n");
+				algo = seq;
 			} else
 				mpi_printf(root, "Warning: unknown algorithm %s, using default.\n", optarg);
 			break;
@@ -150,7 +154,12 @@ int main(int argc, char *argv[])
 
 	double inittime = MPI_Wtime();
 
-	arrayscan(arr, n, rank, size, comm, algo);
+	if (algo == seq) {
+		if (rank == root)
+			prefixSumEx(arr, n);
+	}
+	else
+		arrayscan(arr, n, rank, size, comm, algo);
 
 	double totaltime = MPI_Wtime() - inittime;
 	double mytime = totaltime;
