@@ -10,7 +10,7 @@ function cilk-task-speedup () {
 	tries=10
 
 	if [ -n "$BENCHMARK" ]; then
-		algos="task"
+		alg="task"
 
 		n=`print_power2_seq 20 20`
 		p=`seq 1 48`' '64
@@ -29,31 +29,12 @@ function cilk-n () {
 	rnd_exp=28
 	rnd_seed=42
 
-	if [ -n "$BENCHMARK" ]; then
-		algos="data"
+	algos="data task"
 
-		n=`print_power2_seq 2 4`
-		#n=`print_power2_seq 1 26`' '
-		#n=`seq 1 32`' '`print_power2_seq 5 31`
-		run_it
-
-		#n=`print_rand_seq`
-		#run_it
-	fi
-	process
-
-	logfile="$GITROOT/data/$dir/task-n"
-	if [ -n "$BENCHMARK" ]; then
-		algos="task"
-		n=`print_power2_seq 2 4`
-		#n=`print_power2_seq 1 26`' '
-		#n=`seq 1 32`' '`print_power2_seq 5 31`
-		run_it
-
-		#n=`print_rand_seq`
-		#run_it
-	fi
-	process
+	n=`print_power2_seq 2 4`
+	#n=`print_power2_seq 1 26`' '`print_rand_seq`
+	#n=`seq 1 32`' '`print_power2_seq 5 31`
+	test-algos-n
 }
 
 dir="2-cilk/p1"

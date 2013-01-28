@@ -38,20 +38,18 @@ function run_it () {
 		rm -f "$logfile"
 	fi
 	mkdir -p `dirname "$logfile"`
-	for alg in $algos; do
-		for N in $n; do
-			for NPROC in $p; do
-				cli="$app $proc_opt $NPROC -a $alg -n $N -f $logfile -i $id"
-				echo "Testing '$cli' $tries times"
-				for x in `seq 1 $tries`; do
-					$cli
-					#echo "$cli"
-					bla=$?
-					if [[ ! $bla -eq 0 ]]; then
-						echo "'$cli' failed: $bla"
-						exit $bla
-					fi
-				done
+	for N in $n; do
+		for NPROC in $p; do
+			cli="$app $proc_opt $NPROC -a $alg -n $N -f $logfile -i $id"
+			echo "Testing '$cli' $tries times"
+			for x in `seq 1 $tries`; do
+				$cli
+				#echo "$cli"
+				bla=$?
+				if [[ ! $bla -eq 0 ]]; then
+					echo "'$cli' failed: $bla"
+					exit $bla
+				fi
 			done
 		done
 	done
@@ -73,6 +71,20 @@ function process () {
 		exit $bla
 	fi
 	echo "done"
+}
+
+function test-algos-n () { # calls run_it and process for every alg in $algos
+	if [ -z "$dir" -o -z "$algos" ]; then
+		echo "test-algos-n: missing parameter"
+		exit 1
+	fi
+	for alg in $algos; do
+		logfile="$GITROOT/data/$dir/$alg-n"
+		if [ -n "$BENCHMARK" ]; then
+			run_it
+		fi
+		process
+	done
 }
 
 OCWD=`pwd`
