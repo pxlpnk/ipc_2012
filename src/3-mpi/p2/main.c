@@ -42,8 +42,8 @@ void arrayscan(ATYPE A[], uint n, int rank, int size, MPI_Comm comm, algo_t algo
 				preprefix = tmp + preprefix;
 			}
 		}
-		printf("%d: preprefix %" ATYPEPRINT ", block_sum %" ATYPEPRINT "\n", rank, preprefix, block_sum);
 	}
+	printf("%d: preprefix %" ATYPEPRINT ", block_sum %" ATYPEPRINT "\n", rank, preprefix, block_sum);
 	for (uint i = 0; i < block_size; i++) {
 		block[i] += preprefix;
 	}
@@ -63,8 +63,10 @@ int main(int argc, char *argv[])
 
 	char opt;
 	uint n = 0;
+	enum id {none = -1, alg, proc, en};
+	enum id id = none;
 	algo_t algo = custom;
-	static const char optstring[] = "n:a:f:";
+	static const char optstring[] = "n:a:f:i:p:";
 	static const struct option long_options[] = {
 		{"n",			1, NULL, 'n'},
 		{"file",		1, NULL, 'f'},
@@ -83,6 +85,18 @@ int main(int argc, char *argv[])
 				goto out_mpi;
 			}
 			break;
+		case 'i':
+			if (strcmp(optarg, "a") == 0)
+				id = alg;
+			else if (strcmp(optarg, "p") == 0)
+				id = proc;
+			else if (strcmp(optarg, "n") == 0)
+				id = en;
+			else {
+				fprintf(stderr, "Invalid ID: %s\n", optarg);
+				usage_abort();
+			}
+			break;
 		case 'a':
 			if (strcmp("native", optarg) == 0) {
 				mpi_printf(root, "Using native/MPI implementation of Exscan\n");
@@ -93,6 +107,9 @@ int main(int argc, char *argv[])
 			} else
 				mpi_printf(root, "Warning: unknown algorithm %s, using default.\n", optarg);
 			break;
+		case 'p':
+				mpi_printf(root, "Ignoring p option.\n");
+				break;
 		default:
 			ret = EXIT_FAILURE;
 			goto out_mpi;
@@ -100,10 +117,19 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	if (optind < argc) {
+		fprintf(stderr, "Warning: Extra parameters found.\n");
+	}
+
 	if (n == 0) {
-		mpi_printf(root, "N not given!\n");
+		mpi_printf(root, "Legal array size n required!\n");
 		ret = EXIT_FAILURE;
 		goto out_mpi;
+	}
+
+	if (f != NULL && id == none) {
+		fprintf(stderr, "Legal ID required!\n");
+		usage_abort();
 	}
 
 	ATYPE *arr = malloc(sizeof(ATYPE) * n);
@@ -154,11 +180,25 @@ int main(int argc, char *argv[])
 		else
 			printArrsElem(cor, arr, n-1);
 
+		ret = memcmp(cor, arr, sizeof(ATYPE) * n);
 		printf("Correct? ");
-		if (memcmp(cor, arr, sizeof(ATYPE) * n) == 0) {
+		if (ret == 0) {
 			printf("yes\n");
-			if (f != NULL)
-				fprintf(f,"%s,%d,%d,%lf\n", algo2str[algo], size, n , totaltime);
+			if (f != NULL) {
+				switch (id) {
+					case alg:
+						fprintf(f, "%s,%f\n", algo2str[algo], totaltime);
+						break;
+					case proc:
+						fprintf(f, "%d,%f\n", size, totaltime);
+						break;
+					case en:
+						fprintf(f, "%d,%f\n", n, totaltime);
+						break;
+					default:
+						usage_abort();
+				}
+			}
 		} else {
 			printf("no\n");
 			ret = EXIT_FAILURE;
