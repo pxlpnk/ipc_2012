@@ -430,6 +430,27 @@ Every process had the whole vector to work with and just the partitions of matri
 \end{lstlisting}
 
 
+
+\subsection{ReduceScatter}
+
+First we used MPI\_Scatterv to distribute the matrix and the vector over all nodes.
+As data structure for the matrix an array of the length \texttt{N*N} was used so the data could be sent easier to the single threads. Using ReduceScatter we first reduced the partial results and then sent the resulting data further to the other threads doing the local computation of the product.
+
+\begin{lstlisting}
+  for( int i=0; i < proc_size; i++) {
+    recvcounts[i] = N;
+  }
+
+  for ( int i = 0 ; i < partition ; ++i ){
+    for ( int j = 0 ; j < N ; ++j ){
+      temp_result[j] = temp_result[j] + matrix[i*N+j] * vector[i];
+    }
+  }
+  MPI_Reduce_scatter(temp_result, result,
+                     recvcounts, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+\end{lstlisting}
+
+\subsection{Testing}
 To test and verify the results of the computation, we precalculated the results in the root thread in advance.
 Then we compared the single partitions of the matrix in the root thread with it.
 Measuring the computation time was also tricky, using MPI\_Barrier turned out to be not accurate at all.
@@ -439,9 +460,16 @@ Using MPI\_Reduce to get the time of slowest/last finishing thread returned more
 
 In the local development we could see a minor speedup, although on the \texttt{Jupiter} the speedup was immeasurable.
 The computed result is according to our tests correct, it seems that we introduced a bug that keeps the MPI process from fully distributing the matrix over all threads.
+Also using more than 10 procs turned out to be a problem, the processes then started silently segafaulting.
+This might be connected to the same bug, but we where not able to fix this in time.
 
 
-\subsection{ReduceScatter}
+\subsection{Outcome}
+
+From the data we gathered we can say, that the two algorithms do not differ that much in speedup and performance.
+This outcome needs to be taken with caution, because the results might be inaccurate due the introduced bug.
+In the end we used the save space up to 10 procs to gather the results.
+
 
 %%% Fixed PROCS
 
