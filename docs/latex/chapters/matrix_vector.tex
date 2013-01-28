@@ -5,7 +5,8 @@
 
 \subsection{False Sharing}
 
-The tiling of this loop is based on the length of the input vector. All parallel instances share the same n in this case, this leads to cache update traffic or invalidates memory reads on the cache level when the result vector y[i] gets updated.
+The tiling of this loop is based on the length of the input vector.
+All parallel instances share the same n in this case, this leads to cache update traffic or invalidates memory reads on the cache level when the result vector y[i] gets updated.
 
 \begin{lstlisting}
   for(uint i=rank; i<n; i+=p) {
@@ -16,11 +17,13 @@ The tiling of this loop is based on the length of the input vector. All parallel
   }
 \end{lstlisting}
 
-As seen in the plots this leads to a negative performance impact compared to the other implementation. This is because the the data needs do be redistributed over the cache network everytime an update on a n depending variable happens.
+As seen in the plots this leads to a negative performance impact compared to the other implementation.
+This is because the the data needs do be redistributed over the cache network everytime an update on a n depending variable happens.
 
 \subsection{Tiling}
 
-The tiling of the loop is based on a section per thread. In this case all parallel instances only iterate over ``their'' partition. No updates on the cache level between the instances happen and the memory stays consistent.
+The tiling of the loop is based on a section per thread.
+In this case all parallel instances only iterate over ``their'' partition. No updates on the cache level between the instances happen and the memory stays consistent.
 
 \begin{lstlisting}
   for(uint i=rank*n/p; i< (rank + 1)*n/p; i++) {
@@ -31,14 +34,19 @@ The tiling of the loop is based on a section per thread. In this case all parall
   }
 \end{lstlisting}
 
-The speedup in our test cases  stagnates from 12 threads on in both implementations. We conclude this to the used the 12-core Opteron processors and the messaging overhead between the physical processors.\\
+The speedup in our test cases  stagnates from 12 threads on in both implementations.
+We conclude this to the used the 12-core Opteron processors and the messaging overhead between the physical processors.\\
 
 
-The correctness of both implementations is tested after each computation. Every matrix vector product gets calculated in a single thread as a reference and then compared with the multithreaded result. Also test data is generated with a stable dataset that is generated after the memory of the data structures have been allocated and is always the same with the parameters. The inputs are sanitized and gracefully exits on wrong inputs with an usage message.
+The correctness of both implementations is tested after each computation.
+Every matrix vector product gets calculated in a single thread as a reference and then compared with the multithreaded result.
+Also test data is generated with a stable dataset that is generated after the memory of the data structures have been allocated and is always the same with the parameters.
+The inputs are sanitized and gracefully exits on wrong inputs with an usage message.
 
 \subsection{Goals, Outcome}
 
-We tried to show the potential speedup of the parallelizable algorithm for matrix vector multiplications. The resulting data clearly shows the expected speedup although we could not find a worst/bestcase scenario in our tests.
+We tried to show the potential speedup of the parallelizable algorithm for matrix vector multiplications.
+The resulting data clearly shows the expected speedup although we could not find a worst/bestcase scenario in our tests.
 
 
 \begin{figure}[h!]
@@ -256,13 +264,16 @@ We tried to show the potential speedup of the parallelizable algorithm for matri
 
 	    %\addplot [stack plots=y, fill=none, draw=none, forget plot]		table [x=id, y=min]		{\openmpprefixseqn} \closedcycle;
 	    %\addplot [stack plots=y, fill=olive!40!green!60, fill opacity=0.4, draw opacity=0, area legend]	table [x=id, y expr=\thisrow{med}-\thisrow{min}]	{\openmpprefixseqn} \closedcycle;
-	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingvarprocsB};
+	    \addplot [fill=none, loosely dotted, draw=blue, thick]	table [x=id, y=min]		{\falsesharingvarprocsB};
 	    \addlegendentry{{False Sharing. minimum}}
-	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingvarprocsB};
+
+      \addplot [draw=blue, thick]	table [x=id, y=med]		{\falsesharingvarprocsB};
 	    \addlegendentry{{False Sharing. median}}
-	    \addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingvarprocsB};
+
+      \addplot [fill=none, loosely dotted, draw=red, thick]	table [x=id, y=min]		{\tilingvarprocsB};
 	    \addlegendentry{{Tiling. minimum}}
-	    \addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingvarprocsB};
+
+	    \addplot [draw=red, thick]		table [x=id, y=med]		{\tilingvarprocsB};
 	    \addlegendentry{{Tiling. median}}
 	    %\resetstackedplots
 
@@ -305,17 +316,21 @@ We tried to show the potential speedup of the parallelizable algorithm for matri
 	      ymin=0,
 	    ]
 
-	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingFixedMA};
+	    \addplot [fill=none, draw=blue, loosely dotted, thick]	table [x=id, y=min]		{\falsesharingFixedMA};
 	    \addlegendentry{{False Sharing. minimum}}
-	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingFixedMA};
+
+      \addplot [draw=blue, thick]	table [x=id, y=med]		{\falsesharingFixedMA};
 	    \addlegendentry{{False Sharing. median}}
+
       \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\falsesharingFixedMA};
 	    \addlegendentry{{False Sharing. maximum}}
 
-	    \addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingFixedMA};
+	    \addplot [fill=none, draw=red, loosely dotted, thick]	table [x=id, y=min]		{\tilingFixedMA};
 	    \addlegendentry{{Tiling. minimum}}
-	    \addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingFixedMA};
+
+	    \addplot [draw=red, thick]		table [x=id, y=med]		{\tilingFixedMA};
 	    \addlegendentry{{Tiling. median}}
+
       \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\tilingFixedMA};
 	    \addlegendentry{{Tiling. maximum}}
 
@@ -360,17 +375,21 @@ We tried to show the potential speedup of the parallelizable algorithm for matri
 	      ymin=0,
 	    ]
 
-	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingFixedNA};
+	    \addplot [fill=none, draw=blue, loosely dotted, thick]	table [x=id, y=min]		{\falsesharingFixedNA};
 	    \addlegendentry{{False Sharing. minimum}}
-	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingFixedNA};
+
+      \addplot [draw=blue, thick]	table [x=id, y=med]		{\falsesharingFixedNA};
 	    \addlegendentry{{False Sharing. median}}
+
       \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\falsesharingFixedNA};
 	    \addlegendentry{{False Sharing. maximum}}
 
-	    \addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingFixedNA};
+	    \addplot [fill=none, draw=red,  loosely dotted, thick]	table [x=id, y=min]		{\tilingFixedNA};
 	    \addlegendentry{{Tiling. minimum}}
-	    \addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingFixedNA};
+
+	    \addplot [draw=red, thick]		table [x=id, y=med]		{\tilingFixedNA};
 	    \addlegendentry{{Tiling. median}}
+
       \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\tilingFixedNA};
 	    \addlegendentry{{Tiling. maximum}}
 
@@ -387,6 +406,8 @@ We tried to show the potential speedup of the parallelizable algorithm for matri
 \section{NEC MPI Matrix Vector Multiplication}
 
 
+\subsection{Goals, Outcome}
+This section
 
 
 %%% Fixed PROCS
