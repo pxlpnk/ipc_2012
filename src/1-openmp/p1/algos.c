@@ -94,13 +94,15 @@ void auxarr(ATYPE *x, uint n, uint *opsp) {
 		}
 	} // implicit barrier
 
+	free(tmp);
 	*opsp = ops;
 }
 
-void hillis(ATYPE *x, uint n, uint *opsp) {
+void hillis(ATYPE **arr, uint n, uint *opsp) {
 	uint ops = *opsp;
 
 	ATYPE *y = malloc(n*sizeof(ATYPE));
+	ATYPE *x = *arr;
 	ATYPE *t;
 	for (uint k = 1; k < n; k <<= 1) {
 		#pragma omp parallel reduction(+: ops)
@@ -119,5 +121,7 @@ void hillis(ATYPE *x, uint n, uint *opsp) {
 		t = x; x = y; y = t; // swap
 	}
 
+	free(y);
 	*opsp = ops;
+	*arr = x;
 }

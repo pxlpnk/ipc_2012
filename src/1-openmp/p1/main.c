@@ -11,9 +11,13 @@
 
 typedef void (*scan_func_t)(ATYPE *x, uint n, uint *opsp);
 
-double time_scan_func(scan_func_t f, ATYPE *x, uint n, uint *opsp) {
+double time_scan_func(scan_func_t f, ATYPE **x, uint n, uint *opsp) {
+	ATYPE *arr = *x;
 	double time = omp_get_wtime();
-	f(x, n, opsp);
+	if (f == hillis)
+		hillis(x, n, opsp);
+	else
+		f(arr, n, opsp);
 	return omp_get_wtime() - time;
 }
 
@@ -123,7 +127,7 @@ int main (int argc, char *argv[]) {
 
 	printf("Using %s algorithm\n", func_name);
 	uint ops = 0;
-	double totaltime = time_scan_func(func, arr, n, &ops);
+	double totaltime = time_scan_func(func, &arr, n, &ops);
 
 	printf("%d additions of array elements executed in %lf seconds by 1 thread\n", ops, totaltime);
 

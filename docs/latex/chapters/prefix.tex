@@ -3,6 +3,7 @@
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p1/seq-n.processed}\openmpprefixseqn
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p1/auxarr-n.processed}\openmpprefixauxarrn
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p1/inplace-n.processed}\openmpprefixinplacen
+\pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p1/hillis-n.processed}\openmpprefixhillisn
 
 \begin{figure}[h!]
 \centering
@@ -37,11 +38,15 @@
 	\addlegendentry{{Inplace minimum}}
 	\addplot [draw=green, loosely dotted, thick]table [x=id, y=med]	{\openmpprefixinplacen};
 	\addlegendentry{{Inplace median}}
+	\addplot [fill=none, draw=orange, thick]		table [x=id, y=min]	{\openmpprefixhillisn};
+	\addlegendentry{{Hillis minimum}}
+	\addplot [draw=orange, loosely dotted, thick]table [x=id, y=med]	{\openmpprefixhillisn};
+	\addlegendentry{{Hillis median}}
 	%\resetstackedplots
 
 	\end{axis}
 \end{tikzpicture}
-\caption{Benchmark results showing \textbf{run time per instance size} of the different algorithms in \textbf{OpenMP}. Raw data can be found in the appendix: \autoref{res-tbl:1-1-seq-n} \autoref{res-tbl:1-1-auxarr-n} \autoref{res-tbl:1-1-inplace-n}}
+\caption{Benchmark results showing \textbf{run time per instance size} of the different algorithms in \textbf{OpenMP}. Raw data can be found in the appendix: \autoref{res-tbl:1-1-seq-n} \autoref{res-tbl:1-1-auxarr-n} \autoref{res-tbl:1-1-inplace-n} \autoref{res-tbl:1-1-hillis-n}}
 \label{plot:1-1-n}
 \end{figure}
 
