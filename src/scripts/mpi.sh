@@ -40,8 +40,8 @@ if [ -n "$BENCHMARK" ]; then
 	#make debug
 	make fast
 
-	#mpirun -v -np 576 -node 1-35  $wd/3-mpi-p2.exe -a custom -n 5368709121
-	app="mpirun -np 576 -node 1-35  $wd/3-mpi-p2.exe"
+	#app="mpirun -np 576 -node 1-35  $wd/3-mpi-p2.exe"
+	app="mpirun -np 560 -node 2-35  $wd/3-mpi-p2.exe"
 	proc_opt="-p" # n/a
 fi
 
