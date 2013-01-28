@@ -575,3 +575,19 @@ In the end we used the save space up to 10 procs to gather the results.
   \caption{Benchmark results showing the \textbf{MPI\_Allgather and MPI\_ReduceScatter} implementations with \textbf{NEC-MPI} for a \textbf{fixed size N of 10000 } and \textbf{( variable procs 1..10 )}.  \autoref{res-tbl:3-allgatherVariableProc} \autoref{res-tbl:3-reduceScatterVariableProc}}
   \label{plot:1-1-n}
 \end{figure}
+
+
+
+\chapter{Benchmarking and Testing}
+
+To keep code duplication as minimal as possible we used one central \texttt{util.c} to share methods for generating data, compare test results and other methods that could come in handy.
+Thanks to this we could ensure the correctness of the results and input parameters for our functions.
+
+
+The benchmarks where done using a suite of shell scripts that would call the programs that we need to test and benchmark.
+This helped to keep the process consistent and we could find and fix bugs easier.
+We generally tried to automate everything to be fast in regenerating the benchmark data.
+
+
+The benchmark scripts where also used to process the data and create the statistical output we needed for the report.
+After the data was processed it was parsed by the latex package pgfplots to plot the graphs.
