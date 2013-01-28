@@ -1,0 +1,117 @@
+\chapter{Matrix Vector Multiplication}
+\section{OpenMP Matrix Vector Multiplication}
+\pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p2/false-sharing-variable-procs-1000x100000.processed}\falsesharingvarprocsA
+\pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p2/tiling-variable-procs-1000x100000.processed}\tilingvarprocsA
+
+
+\begin{figure}[h!]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+	      width=0.8\linewidth,
+	      xlabel={Threads},
+	      ylabel={Time [s]},
+	      %xmode=log, ymode=log,
+	      enlarge x limits=false,
+	      axis on top,
+	      legend transposed =true,
+	      legend style={
+		      draw=none,
+		      cells={anchor=west},
+		      legend pos=outer north east,
+	      },
+	      reverse legend,
+	      ymin=0,
+	    ]
+	    \addplot [stack plots=y, fill=none, draw=none, forget plot]		table [x=id, y=min]		{\tilingvarprocsA} \closedcycle;
+	    \addplot [stack plots=y, fill=green, fill opacity=0.4, draw opacity=0, area legend]	table [x=id, y expr=\thisrow{med}-\thisrow{min}]	{\tilingvarprocsA} \closedcycle;
+	    \addplot [stack plots=false, draw=black, thick]					table [x=id, y=med]		{\tilingvarprocsA};
+	    \addplot [stack plots=y, fill=red!50, fill opacity=0.4, draw opacity=0, area legend]table [x=id, y expr=\thisrow{max}-\thisrow{med}]	{\tilingvarprocsA} \closedcycle;
+
+	    \addlegendentry{{below med.}}
+	    \addlegendentry{{med.}}
+	    \addlegendentry{{above med.}}
+
+	  \end{axis}
+  \end{tikzpicture}
+  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{1000x100000 matrix}. Raw data can be found in the appendix: \autoref{res-tbl:3-tilingvarprocsA}}
+  \label{plot:3-tilingvarprocsA}
+\end{figure}
+
+
+\begin{figure}[h!]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+	      width=0.8\linewidth,
+	      xlabel={Threads},
+	      ylabel={Time [s]},
+	      %xmode=log, ymode=log,
+	      enlarge x limits=false,
+	      axis on top,
+	      legend transposed =true,
+	      legend style={
+		      draw=none,
+		      cells={anchor=west},
+		      legend pos=outer north east,
+	      },
+	      reverse legend,
+	      ymin=0,
+	    ]
+	    \addplot [stack plots=y, fill=none, draw=none, forget plot]		table [x=id, y=min]		{\falsesharingvarprocsA} \closedcycle;
+	    \addplot [stack plots=y, fill=green, fill opacity=0.4, draw opacity=0, area legend]	table [x=id, y expr=\thisrow{med}-\thisrow{min}]	{\falsesharingvarprocsA} \closedcycle;
+	    \addplot [stack plots=false, draw=black, thick]					table [x=id, y=med]		{\falsesharingvarprocsA};
+	    \addplot [stack plots=y, fill=red!50, fill opacity=0.4, draw opacity=0, area legend]table [x=id, y expr=\thisrow{max}-\thisrow{med}]	{\falsesharingvarprocsA} \closedcycle;
+
+	    \addlegendentry{{below med.}}
+	    \addlegendentry{{med.}}
+	    \addlegendentry{{above med.}}
+
+	  \end{axis}
+  \end{tikzpicture}
+  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{1000x100000 matrix}. Raw data can be found in the appendix: \autoref{res-tbl:3-tilingvarprocsA}}
+  \label{plot:3-falsesharingvarprocsA}
+\end{figure}
+
+
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+  xlabel={Threads},
+	ylabel={Time [s]},
+	%legend columns=4,
+	%legend entries={data:,below median,median,above median,
+					%task:,below median,median,above median},
+	xmode=linear, ymode=linear,
+	enlarge x limits=false,
+	axis on top,
+	legend transposed =true,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	%reverse legend,
+	ymin=0,
+	]
+
+	%\addplot [stack plots=y, fill=none, draw=none, forget plot]		table [x=id, y=min]		{\openmpprefixseqn} \closedcycle;
+	%\addplot [stack plots=y, fill=olive!40!green!60, fill opacity=0.4, draw opacity=0, area legend]	table [x=id, y expr=\thisrow{med}-\thisrow{min}]	{\openmpprefixseqn} \closedcycle;
+	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingvarprocsA};
+	\addlegendentry{{False Sharing. minimum}}
+	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingvarprocsA};
+	\addlegendentry{{False Sharing. median}}
+	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingvarprocsA};
+	\addlegendentry{{Tiling. minimum}}
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingvarprocsA};
+	\addlegendentry{{Tiling. median}}
+	%\resetstackedplots
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing the different algorithms in \textbf{OpenMP}. Raw data can be found in the appendix: \autoref{res-tbl:1-1-seq-n} \autoref{res-tbl:1-1-auxarr-n} \autoref{res-tbl:1-1-inplace-n}}
+\label{plot:1-1-n}
+\end{figure}
