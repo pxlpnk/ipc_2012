@@ -3,6 +3,43 @@
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p2/false-sharing-variable-procs-1000x100000.processed}\falsesharingvarprocsA
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p2/tiling-variable-procs-1000x100000.processed}\tilingvarprocsA
 
+\subsection{False Sharing}
+
+The tiling of this loop is based on the length of the input vector. All parallel instances share the same n in this case, this leads to cache update traffic or invalidates memory reads on the cache level when the result vector y[i] gets updated.
+
+\begin{lstlisting}
+  for(uint i=rank; i<n; i+=p) {
+    y[i]=0;
+    for(uint j=0; j<m; j++) {
+      y[i] += x[i][j] * a[j];
+    }
+  }
+\end{lstlisting}
+
+As seen in the plots this leads to a negative performance impact compared to the other implementation. This is because the the data needs do be redistributed over the cache network everytime an update on a n depending variable happens.
+
+\subsection{Tiling}
+
+The tiling of the loop is based on a section per thread. In this case all parallel instances only iterate over ``their'' partition. No updates on the cache level between the instances happen and the memory stays consistent.
+
+\begin{lstlisting}
+  for(uint i=rank*n/p; i< (rank + 1)*n/p; i++) {
+    y[i] = 0;
+    for(uint j=0; j<m; j++) {
+      y[i] += x[i][j] * a[j];
+    }
+  }
+\end{lstlisting}
+
+The speedup in our test cases  stagnates from 12 threads on in both implementations. We conclude this to the used the 12-core Opteron processors and the messaging overhead between the physical processors.\\
+
+
+The correctness of both implementations is tested after each computation. Every matrix vector product gets calculated in a single thread as a reference and then compared with the multithreaded result. Also test data is generated with a stable dataset that is generated after the memory of the data structures have been allocated and is always the same with the parameters. The inputs are sanitized and gracefully exits on wrong inputs with an usage message.
+
+\subsection{Goals, Outcome}
+
+We tried to show the potential speedup of the parallelizable algorithm for matrix vector multiplications. The resulting data clearly shows the expected speedup although we could not find a worst/bestcase scenario in our tests.
+
 
 \begin{figure}[h!]
   \centering
@@ -34,7 +71,7 @@
 
 	  \end{axis}
   \end{tikzpicture}
-  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{1000x100000 matrix}. Raw data can be found in the appendix: \autoref{res-tbl:3-tilingvarprocsA}}
+  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{1000x100000 matrix}. \autoref{res-tbl:3-tilingvarprocsA}}
   \label{plot:3-tilingvarprocsA}
 \end{figure}
 
@@ -69,51 +106,51 @@
 
 	  \end{axis}
   \end{tikzpicture}
-  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{1000x100000 matrix}. Raw data can be found in the appendix: \autoref{res-tbl:3-tilingvarprocsA}}
+  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{1000x100000 matrix}. \autoref{res-tbl:3-tilingvarprocsA}}
   \label{plot:3-falsesharingvarprocsA}
 \end{figure}
 
 
 
 \begin{figure}[h!]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-	width=0.8\linewidth,
-  xlabel={Threads},
-	ylabel={Time [s]},
-	%legend columns=4,
-	%legend entries={data:,below median,median,above median,
-					%task:,below median,median,above median},
-	xmode=linear, ymode=linear,
-	enlarge x limits=false,
-	axis on top,
-	legend transposed =true,
-	legend style={
-		draw=none,
-		cells={anchor=west},
-		legend pos=outer north east,
-	},
-	%reverse legend,
-	ymin=0,
-	]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+	      width=0.8\linewidth,
+        xlabel={Threads},
+	      ylabel={Time [s]},
+	      %legend columns=4,
+	      %legend entries={data:,below median,median,above median,
+				%task:,below median,median,above median},
+	      xmode=linear, ymode=linear,
+	      enlarge x limits=false,
+	      axis on top,
+	      legend transposed =true,
+	      legend style={
+		      draw=none,
+		      cells={anchor=west},
+		      legend pos=outer north east,
+	      },
+	      %reverse legend,
+	      ymin=0,
+	    ]
 
-	%\addplot [stack plots=y, fill=none, draw=none, forget plot]		table [x=id, y=min]		{\openmpprefixseqn} \closedcycle;
-	%\addplot [stack plots=y, fill=olive!40!green!60, fill opacity=0.4, draw opacity=0, area legend]	table [x=id, y expr=\thisrow{med}-\thisrow{min}]	{\openmpprefixseqn} \closedcycle;
-	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingvarprocsA};
-	\addlegendentry{{False Sharing. minimum}}
-	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingvarprocsA};
-	\addlegendentry{{False Sharing. median}}
-	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingvarprocsA};
-	\addlegendentry{{Tiling. minimum}}
-	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingvarprocsA};
-	\addlegendentry{{Tiling. median}}
-	%\resetstackedplots
+	    %\addplot [stack plots=y, fill=none, draw=none, forget plot]		table [x=id, y=min]		{\openmpprefixseqn} \closedcycle;
+	    %\addplot [stack plots=y, fill=olive!40!green!60, fill opacity=0.4, draw opacity=0, area legend]	table [x=id, y expr=\thisrow{med}-\thisrow{min}]	{\openmpprefixseqn} \closedcycle;
+	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingvarprocsA};
+	    \addlegendentry{{False Sharing. minimum}}
+	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingvarprocsA};
+	    \addlegendentry{{False Sharing. median}}
+	    \addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingvarprocsA};
+	    \addlegendentry{{Tiling. minimum}}
+	    \addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingvarprocsA};
+	    \addlegendentry{{Tiling. median}}
+	    %\resetstackedplots
 
-	\end{axis}
-\end{tikzpicture}
-\caption{Benchmark results showing the different algorithms in \textbf{OpenMP}. Raw data can be found in the appendix: \autoref{res-tbl:1-1-seq-n} \autoref{res-tbl:1-1-auxarr-n} \autoref{res-tbl:1-1-inplace-n}}
-\label{plot:1-1-n}
+	  \end{axis}
+  \end{tikzpicture}
+  \caption{Benchmark results showing the different algorithms in \textbf{OpenMP}. \autoref{res-tbl:1-1-seq-n} \autoref{res-tbl:1-1-auxarr-n} \autoref{res-tbl:1-1-inplace-n}}
+  \label{plot:1-1-n}
 \end{figure}
 
 
@@ -153,7 +190,7 @@
 
 	  \end{axis}
   \end{tikzpicture}
-  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{100000x1000 matrix}. Raw data can be found in the appendix: \autoref{res-tbl:3-tilingvarprocsB}}
+  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{100000x1000 matrix}. \autoref{res-tbl:3-tilingvarprocsB}}
   \label{plot:3-tilingvarprocsB}
 \end{figure}
 
@@ -195,44 +232,44 @@
 
 
 \begin{figure}[h!]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-	width=0.8\linewidth,
-  xlabel={Threads},
-	ylabel={Time [s]},
-	%legend columns=4,
-	%legend entries={data:,below median,median,above median,
-					%task:,below median,median,above median},
-	xmode=linear, ymode=linear,
-	enlarge x limits=false,
-	axis on top,
-	legend transposed =true,
-	legend style={
-		draw=none,
-		cells={anchor=west},
-		legend pos=outer north east,
-	},
-	%reverse legend,
-	ymin=0,
-	]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+	      width=0.8\linewidth,
+        xlabel={Threads},
+	      ylabel={Time [s]},
+	      %legend columns=4,
+	      %legend entries={data:,below median,median,above median,
+				%task:,below median,median,above median},
+	      xmode=linear, ymode=linear,
+	      enlarge x limits=false,
+	      axis on top,
+	      legend transposed =true,
+	      legend style={
+		      draw=none,
+		      cells={anchor=west},
+		      legend pos=outer north east,
+	      },
+	      %reverse legend,
+	      ymin=0,
+	    ]
 
-	%\addplot [stack plots=y, fill=none, draw=none, forget plot]		table [x=id, y=min]		{\openmpprefixseqn} \closedcycle;
-	%\addplot [stack plots=y, fill=olive!40!green!60, fill opacity=0.4, draw opacity=0, area legend]	table [x=id, y expr=\thisrow{med}-\thisrow{min}]	{\openmpprefixseqn} \closedcycle;
-	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingvarprocsB};
-	\addlegendentry{{False Sharing. minimum}}
-	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingvarprocsB};
-	\addlegendentry{{False Sharing. median}}
-	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingvarprocsB};
-	\addlegendentry{{Tiling. minimum}}
-	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingvarprocsB};
-	\addlegendentry{{Tiling. median}}
-	%\resetstackedplots
+	    %\addplot [stack plots=y, fill=none, draw=none, forget plot]		table [x=id, y=min]		{\openmpprefixseqn} \closedcycle;
+	    %\addplot [stack plots=y, fill=olive!40!green!60, fill opacity=0.4, draw opacity=0, area legend]	table [x=id, y expr=\thisrow{med}-\thisrow{min}]	{\openmpprefixseqn} \closedcycle;
+	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingvarprocsB};
+	    \addlegendentry{{False Sharing. minimum}}
+	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingvarprocsB};
+	    \addlegendentry{{False Sharing. median}}
+	    \addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingvarprocsB};
+	    \addlegendentry{{Tiling. minimum}}
+	    \addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingvarprocsB};
+	    \addlegendentry{{Tiling. median}}
+	    %\resetstackedplots
 
-	\end{axis}
-\end{tikzpicture}
-\caption{Benchmark results showing the different algorithms in \textbf{OpenMP}. \autoref{res-tbl:3-tilingvarprocsB} \autoref{res-tbl:3-falsesharingvarprocsB}}
-\label{plot:1-1-n}
+	  \end{axis}
+  \end{tikzpicture}
+  \caption{Benchmark results showing the different algorithms in \textbf{OpenMP}. \autoref{res-tbl:3-tilingvarprocsB} \autoref{res-tbl:3-falsesharingvarprocsB}}
+  \label{plot:1-1-n}
 \end{figure}
 
 
@@ -246,48 +283,48 @@
 
 
 \begin{figure}[h!]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-	width=0.8\linewidth,
-  xlabel={N},
-	ylabel={Time [s]},
-	%legend columns=4,
-	%legend entries={data:,below median,median,above median,
-					%task:,below median,median,above median},
-	xmode=linear, ymode=linear,
-	enlarge x limits=false,
-	axis on top,
-	legend transposed =true,
-	legend style={
-		draw=none,
-		cells={anchor=west},
-		legend pos=outer north east,
-	},
-	%reverse legend,
-	ymin=0,
-	]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+	      width=0.8\linewidth,
+        xlabel={N},
+	      ylabel={Time [s]},
+	      %legend columns=4,
+	      %legend entries={data:,below median,median,above median,
+				%task:,below median,median,above median},
+	      xmode=linear, ymode=linear,
+	      enlarge x limits=false,
+	      axis on top,
+	      legend transposed =true,
+	      legend style={
+		      draw=none,
+		      cells={anchor=west},
+		      legend pos=outer north east,
+	      },
+	      %reverse legend,
+	      ymin=0,
+	    ]
 
-	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingFixedMA};
-	\addlegendentry{{False Sharing. minimum}}
-	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingFixedMA};
-	\addlegendentry{{False Sharing. median}}
-  \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\falsesharingFixedMA};
-	\addlegendentry{{False Sharing. maximum}}
+	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingFixedMA};
+	    \addlegendentry{{False Sharing. minimum}}
+	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingFixedMA};
+	    \addlegendentry{{False Sharing. median}}
+      \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\falsesharingFixedMA};
+	    \addlegendentry{{False Sharing. maximum}}
 
-	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingFixedMA};
-	\addlegendentry{{Tiling. minimum}}
-	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingFixedMA};
-	\addlegendentry{{Tiling. median}}
-  \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\tilingFixedMA};
-	\addlegendentry{{Tiling. maximum}}
+	    \addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingFixedMA};
+	    \addlegendentry{{Tiling. minimum}}
+	    \addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingFixedMA};
+	    \addlegendentry{{Tiling. median}}
+      \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\tilingFixedMA};
+	    \addlegendentry{{Tiling. maximum}}
 
-	%\resetstackedplots
+	    %\resetstackedplots
 
-	\end{axis}
-\end{tikzpicture}
-\caption{Benchmark results showing the different algorithms in \textbf{OpenMP} for a \textbf{fixed M } and a \textbf{variable N ( 10 100 500 1000 5000 10000 50000 100000 )}.  \autoref{res-tbl:3-tilingFixedMA} \autoref{res-tbl:3-falsesharingFixedMA}}
-\label{plot:1-1-n}
+	  \end{axis}
+  \end{tikzpicture}
+  \caption{Benchmark results showing the different algorithms in \textbf{OpenMP} for a \textbf{fixed M } and a \textbf{variable N ( 10 100 500 1000 5000 10000 50000 100000 )}.  \autoref{res-tbl:3-tilingFixedMA} \autoref{res-tbl:3-falsesharingFixedMA}}
+  \label{plot:1-1-n}
 \end{figure}
 
 
@@ -301,48 +338,48 @@
 
 
 \begin{figure}[h!]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-	width=0.8\linewidth,
-  xlabel={M},
-	ylabel={Time [s]},
-	%legend columns=4,
-	%legend entries={data:,below median,median,above median,
-					%task:,below median,median,above median},
-	xmode=linear, ymode=linear,
-	enlarge x limits=false,
-	axis on top,
-	legend transposed =true,
-	legend style={
-		draw=none,
-		cells={anchor=west},
-		legend pos=outer north east,
-	},
-	%reverse legend,
-	ymin=0,
-	]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+	      width=0.8\linewidth,
+        xlabel={M},
+	      ylabel={Time [s]},
+	      %legend columns=4,
+	      %legend entries={data:,below median,median,above median,
+				%task:,below median,median,above median},
+	      xmode=linear, ymode=linear,
+	      enlarge x limits=false,
+	      axis on top,
+	      legend transposed =true,
+	      legend style={
+		      draw=none,
+		      cells={anchor=west},
+		      legend pos=outer north east,
+	      },
+	      %reverse legend,
+	      ymin=0,
+	    ]
 
-	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingFixedNA};
-	\addlegendentry{{False Sharing. minimum}}
-	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingFixedNA};
-	\addlegendentry{{False Sharing. median}}
-  \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\falsesharingFixedNA};
-	\addlegendentry{{False Sharing. maximum}}
+	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingFixedNA};
+	    \addlegendentry{{False Sharing. minimum}}
+	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingFixedNA};
+	    \addlegendentry{{False Sharing. median}}
+      \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\falsesharingFixedNA};
+	    \addlegendentry{{False Sharing. maximum}}
 
-	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingFixedNA};
-	\addlegendentry{{Tiling. minimum}}
-	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingFixedNA};
-	\addlegendentry{{Tiling. median}}
-  \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\tilingFixedNA};
-	\addlegendentry{{Tiling. maximum}}
+	    \addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingFixedNA};
+	    \addlegendentry{{Tiling. minimum}}
+	    \addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingFixedNA};
+	    \addlegendentry{{Tiling. median}}
+      \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\tilingFixedNA};
+	    \addlegendentry{{Tiling. maximum}}
 
-	%\resetstackedplots
+	    %\resetstackedplots
 
-	\end{axis}
-\end{tikzpicture}
-\caption{Benchmark results showing the different algorithms in \textbf{OpenMP} for a \textbf{fixed N } and a \textbf{variable M ( 10 100 500 1000 5000 10000 50000 100000 )}.  \autoref{res-tbl:3-tilingFixedNA} \autoref{res-tbl:3-falsesharingFixedNA}}
-\label{plot:1-1-n}
+	  \end{axis}
+  \end{tikzpicture}
+  \caption{Benchmark results showing the different algorithms in \textbf{OpenMP} for a \textbf{fixed N } and a \textbf{variable M ( 10 100 500 1000 5000 10000 50000 100000 )}.  \autoref{res-tbl:3-tilingFixedNA} \autoref{res-tbl:3-falsesharingFixedNA}}
+  \label{plot:1-1-n}
 \end{figure}
 
 
@@ -360,48 +397,48 @@
 
 
 \begin{figure}[h!]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-	width=0.8\linewidth,
-  xlabel={N},
-	ylabel={Time [s]},
-	%legend columns=4,
-	%legend entries={data:,below median,median,above median,
-					%task:,below median,median,above median},
-	xmode=linear, ymode=log,
-	enlarge x limits=false,
-	axis on top,
-	legend transposed =true,
-	legend style={
-		draw=none,
-		cells={anchor=west},
-		legend pos=outer north east,
-	},
-	%reverse legend,
-	ymin=0,
-	]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+	      width=0.8\linewidth,
+        xlabel={N},
+	      ylabel={Time [s]},
+	      %legend columns=4,
+	      %legend entries={data:,below median,median,above median,
+				%task:,below median,median,above median},
+	      xmode=linear, ymode=log,
+	      enlarge x limits=false,
+	      axis on top,
+	      legend transposed =true,
+	      legend style={
+		      draw=none,
+		      cells={anchor=west},
+		      legend pos=outer north east,
+	      },
+	      %reverse legend,
+	      ymin=0,
+	    ]
 
-	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\AllgatherFixedProcs};
-	\addlegendentry{{MPI\_Allgather min}}
-	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\AllgatherFixedProcs};
-	\addlegendentry{{MPI\_Allgather med}}
-  \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\AllgatherFixedProcs};
-	\addlegendentry{{MPI\_Allgather max}}
+	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\AllgatherFixedProcs};
+	    \addlegendentry{{MPI\_Allgather min}}
+	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\AllgatherFixedProcs};
+	    \addlegendentry{{MPI\_Allgather med}}
+      \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\AllgatherFixedProcs};
+	    \addlegendentry{{MPI\_Allgather max}}
 
-	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\ReduceScatterFixedProcs};
-	\addlegendentry{{MPI\_ReduceScatter min}}
-	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\ReduceScatterFixedProcs};
-	\addlegendentry{{MPI\_ReduceScatter med}}
-  \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\ReduceScatterFixedProcs};
-	\addlegendentry{{MPI\_ReduceScatter max}}
+	    \addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\ReduceScatterFixedProcs};
+	    \addlegendentry{{MPI\_ReduceScatter min}}
+	    \addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\ReduceScatterFixedProcs};
+	    \addlegendentry{{MPI\_ReduceScatter med}}
+      \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\ReduceScatterFixedProcs};
+	    \addlegendentry{{MPI\_ReduceScatter max}}
 
-	%\resetstackedplots
+	    %\resetstackedplots
 
-	\end{axis}
-\end{tikzpicture}
-\caption{Benchmark results showing the \textbf{MPI\_Allgather and MPI\_ReduceScatter} implementations with \textbf{NEC-MPI} for a \textbf{fixed proc size of 10 } and a \textbf{variable N ( 100 500 1000 5000 10000 )}.  \autoref{res-tbl:3-allgatherFixedProc} \autoref{res-tbl:3-reduceScatterFixedProc}}
-\label{plot:1-1-n}
+	  \end{axis}
+  \end{tikzpicture}
+  \caption{Benchmark results showing the \textbf{MPI\_Allgather and MPI\_ReduceScatter} implementations with \textbf{NEC-MPI} for a \textbf{fixed proc size of 10 } and a \textbf{variable N ( 100 500 1000 5000 10000 )}.  \autoref{res-tbl:3-allgatherFixedProc} \autoref{res-tbl:3-reduceScatterFixedProc}}
+  \label{plot:1-1-n}
 \end{figure}
 
 
@@ -413,46 +450,46 @@
 
 
 \begin{figure}[h!]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-	width=0.8\linewidth,
-  xlabel={Procs},
-	ylabel={Time [s]},
-	%legend columns=4,
-	%legend entries={data:,below median,median,above median,
-					%task:,below median,median,above median},
-	xmode=linear, ymode=log,
-	enlarge x limits=false,
-	axis on top,
-	legend transposed =true,
-	legend style={
-		draw=none,
-		cells={anchor=west},
-		legend pos=outer north east,
-	},
-	%reverse legend,
-	ymin=0,
-	]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+	      width=0.8\linewidth,
+        xlabel={Procs},
+	      ylabel={Time [s]},
+	      %legend columns=4,
+	      %legend entries={data:,below median,median,above median,
+				%task:,below median,median,above median},
+	      xmode=linear, ymode=log,
+	      enlarge x limits=false,
+	      axis on top,
+	      legend transposed =true,
+	      legend style={
+		      draw=none,
+		      cells={anchor=west},
+		      legend pos=outer north east,
+	      },
+	      %reverse legend,
+	      ymin=0,
+	    ]
 
-	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\AllgatherVariableProcs};
-	\addlegendentry{{MPI\_Allgather min}}
-	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\AllgatherVariableProcs};
-	\addlegendentry{{MPI\_Allgather med}}
-  \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\AllgatherVariableProcs};
-	\addlegendentry{{MPI\_Allgather max}}
+	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\AllgatherVariableProcs};
+	    \addlegendentry{{MPI\_Allgather min}}
+	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\AllgatherVariableProcs};
+	    \addlegendentry{{MPI\_Allgather med}}
+      \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\AllgatherVariableProcs};
+	    \addlegendentry{{MPI\_Allgather max}}
 
-	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\ReduceScatterVariableProcs};
-	\addlegendentry{{MPI\_ReduceScatter min}}
-	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\ReduceScatterVariableProcs};
-	\addlegendentry{{MPI\_ReduceScatter med}}
-  \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\ReduceScatterVariableProcs};
-	\addlegendentry{{MPI\_ReduceScatter max}}
+	    \addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\ReduceScatterVariableProcs};
+	    \addlegendentry{{MPI\_ReduceScatter min}}
+	    \addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\ReduceScatterVariableProcs};
+	    \addlegendentry{{MPI\_ReduceScatter med}}
+      \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\ReduceScatterVariableProcs};
+	    \addlegendentry{{MPI\_ReduceScatter max}}
 
-	%\resetstackedplots
+	    %\resetstackedplots
 
-	\end{axis}
-\end{tikzpicture}
-\caption{Benchmark results showing the \textbf{MPI\_Allgather and MPI\_ReduceScatter} implementations with \textbf{NEC-MPI} for a \textbf{fixed size N of 10000 } and \textbf{( variable procs 1..10 )}.  \autoref{res-tbl:3-allgatherVariableProc} \autoref{res-tbl:3-reduceScatterVariableProc}}
-\label{plot:1-1-n}
+	  \end{axis}
+  \end{tikzpicture}
+  \caption{Benchmark results showing the \textbf{MPI\_Allgather and MPI\_ReduceScatter} implementations with \textbf{NEC-MPI} for a \textbf{fixed size N of 10000 } and \textbf{( variable procs 1..10 )}.  \autoref{res-tbl:3-allgatherVariableProc} \autoref{res-tbl:3-reduceScatterVariableProc}}
+  \label{plot:1-1-n}
 \end{figure}
