@@ -117,5 +117,44 @@
 \end{figure}
 
 \section{MPI Prefix Sums}
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/custom-n.processed}\openmpprefixcustomn
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/native-n.processed}\openmpprefixnativen
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/seq-n.processed}\openmpprefixseqn
 
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+	xlabel={Instance Size [array elements]},
+	ylabel={Time [s]},
+	xmode=log, ymode=log,
+	enlarge x limits=false,
+	axis on top,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	%reverse legend,
+	ymin=0,
+	]
 
+	\addplot [fill=none, draw=blue, thick]			table [x=id, y=min]	{\openmpprefixseqn};
+	\addlegendentry{{Seq. minimum}}
+	\addplot [draw=blue, loosely dotted, thick]		table [x=id, y=med]	{\openmpprefixseqn};
+	\addlegendentry{{Seq. median}}
+	\addplot [fill=none, draw=red, thick]			table [x=id, y=min]	{\openmpprefixcustomn};
+	\addlegendentry{{Custom minimum}}
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]	{\openmpprefixcustomn};
+	\addlegendentry{{Custom median}}
+	\addplot [fill=none, draw=green, thick]			table [x=id, y=min]	{\openmpprefixnativen};
+	\addlegendentry{{Native minimum}}
+	\addplot [draw=green, loosely dotted, thick]	table [x=id, y=med]	{\openmpprefixnativen};
+	\addlegendentry{{Native median}}
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing \textbf{run time per instance size} of the different algorithms in \textbf{MPI}. Raw data can be found in the appendix: \autoref{res-tbl:3-2-seq-n} \autoref{res-tbl:3-2-custom-n} \autoref{res-tbl:3-2-native-n}}
+\label{plot:3-2-n}
+\end{figure}
