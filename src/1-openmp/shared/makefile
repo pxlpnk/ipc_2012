@@ -6,8 +6,10 @@ CC ?= gcc
 P := $(shell dirname $(CWD))
 EXE ?= $(shell basename $(P))-$(shell basename $(CWD)).exe
 CFLAGS ?= -fopenmp -Wall -pedantic -O3 -std=gnu99 -D ATYPE=$(ATYPE) -D ATYPEPRINT=$(ATYPEPRINT)
+CPPFLAGS ?= -I ../../../shared/ -I ../../shared/
 SRCS := \
 	$(wildcard ../../../shared/*.c) \
+	$(wildcard ../../shared/*.c) \
 	$(wildcard *.c)
 OBJS = $(SRCS:%.c=%.o)
 
@@ -23,7 +25,7 @@ debug: $(EXE)
 	$(CC) $(CFLAGS) $^ -o $@
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 clean:
 	rm -rf $(EXE) $(OBJS)
