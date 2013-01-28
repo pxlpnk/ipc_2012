@@ -14,7 +14,7 @@ function cilk-task-speedup () {
 
 		n=`print_power2_seq 20 20`
 		p=`seq 1 48`' '64
-		test_it
+		run_it
 	fi
 	process
 }
@@ -35,10 +35,10 @@ function cilk-n () {
 		n=`print_power2_seq 2 4`
 		#n=`print_power2_seq 1 26`' '
 		#n=`seq 1 32`' '`print_power2_seq 5 31`
-		test_it
+		run_it
 
 		#n=`print_rand_seq`
-		#test_it
+		#run_it
 	fi
 	process
 
@@ -48,10 +48,10 @@ function cilk-n () {
 		n=`print_power2_seq 2 4`
 		#n=`print_power2_seq 1 26`' '
 		#n=`seq 1 32`' '`print_power2_seq 5 31`
-		test_it
+		run_it
 
 		#n=`print_rand_seq`
-		#test_it
+		#run_it
 	fi
 	process
 }

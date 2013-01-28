@@ -29,8 +29,8 @@ function print_rand_seq () { # print $rnd_times times 2^<random> <= 2^$rnd_exp, 
 	done
 }
 
-function test_it () {
-	if [ -z "$tries" -o -z "$app" -o -z "$proc_opt" -o -z "$algos" -o -z "$p" -o -z "$n" -o -z "$logfile" ]; then
+function run_it () {
+	if [ -z "$tries" -o -z "$app" -o -z "$proc_opt" -o -z "$alg" -o -z "$p" -o -z "$n" -o -z "$logfile" ]; then
 		echo "missing parameter"
 		exit 1
 	fi
