@@ -16,7 +16,7 @@ OBJS = $(SRCS:%.c=%.o)
 CILKDSRCS := \
 	$(wildcard *.cilk)
 
-all: fast
+all: debug
 
 fast: $(EXE)
 
