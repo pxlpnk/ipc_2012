@@ -6,7 +6,7 @@
 \subsection{False Sharing}
 
 The tiling of this loop is based on the length of the input vector.
-All parallel instances share the same n in this case, this leads to cache update traffic or invalidates memory reads on the cache level when the result vector y[i] gets updated.
+All parallel instances share the same n in this case, this leads to cache update traffic or invalidates memory reads on the cache level when the result vector \texttt{y[i]} gets updated.
 
 \begin{lstlisting}
   for(uint i=rank; i<n; i+=p) {
@@ -35,7 +35,7 @@ In this case all parallel instances only iterate over ``their'' partition. No up
 \end{lstlisting}
 
 The speedup in our test cases  stagnates from 12 threads on in both implementations.
-We conclude this to the used the 12-core Opteron processors and the messaging overhead between the physical processors.\\
+We presume this to the used the 12-core Opteron processors and the messaging overhead between the physical processors.
 
 
 The correctness of both implementations is tested after each computation.
@@ -496,7 +496,7 @@ This section
 	    \addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\AllgatherVariableProcs};
 	    \addlegendentry{{MPI\_Allgather min}}
 	    \addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\AllgatherVariableProcs};
-	    \addlegendentry{{MPI\_Allgather med}}
+ 	    \addlegendentry{{MPI\_Allgather med}}
       \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\AllgatherVariableProcs};
 	    \addlegendentry{{MPI\_Allgather max}}
 
