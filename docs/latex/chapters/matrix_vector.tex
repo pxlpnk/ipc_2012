@@ -272,10 +272,16 @@
 	\addlegendentry{{False Sharing. minimum}}
 	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingFixedMA};
 	\addlegendentry{{False Sharing. median}}
+  \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\falsesharingFixedMA};
+	\addlegendentry{{False Sharing. maximum}}
+
 	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingFixedMA};
 	\addlegendentry{{Tiling. minimum}}
 	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingFixedMA};
 	\addlegendentry{{Tiling. median}}
+  \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\tilingFixedMA};
+	\addlegendentry{{Tiling. maximum}}
+
 	%\resetstackedplots
 
 	\end{axis}
