@@ -406,9 +406,42 @@ The resulting data clearly shows the expected speedup although we could not find
 \section{NEC MPI Matrix Vector Multiplication}
 
 
-\subsection{Goals, Outcome}
-This section
+\subsection{Allgather}
 
+
+Every process computes the result for a \texttt{partition = N/size} (where  N is the matrix rank) of the matrix locally and distributes the result to all the other processes.
+A difficulty here was to find the right partition size and handle the rest that where smaller than the partition size, also figuring out what happens on which process turned out to be not so easy.
+Every process had the whole vector to work with and just the partitions of matrix where distributed.
+
+
+\begin{lstlisting}
+  for(int i= (rank * partition);
+  i < ((rank + 1 ) * partition) ;
+  i++) {
+    sendbuff[i] = 0;
+    for (int k=0; k<N; k++) {
+      sendbuff[i] = sendbuff[i] + matrix[i][k] * vector[k];
+    }
+  }
+
+  MPI_Allgather(&sendbuff, partition, ATYPE_MPI,
+  &recvbuff, partition, ATYPE_MPI,
+  MPI_COMM_WORLD);
+\end{lstlisting}
+
+
+To test and verify the results of the computation, we precalculated the results in the root thread in advance.
+Then we compared the single partitions of the matrix in the root thread with it.
+Measuring the computation time was also tricky, using MPI\_Barrier turned out to be not accurate at all.
+Using MPI\_Reduce to get the time of slowest/last finishing thread returned more usable results.
+
+\subsection{Problems}
+
+In the local development we could see a minor speedup, although on the \texttt{Jupiter} the speedup was immeasurable.
+The computed result is according to our tests correct, it seems that we introduced a bug that keeps the MPI process from fully distributing the matrix over all threads.
+
+
+\subsection{ReduceScatter}
 
 %%% Fixed PROCS
 
