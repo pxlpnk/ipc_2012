@@ -6,13 +6,16 @@ function cilk-task-speedup () {
 	logfile="$GITROOT/data/$dir/task-speedup"
 
 	id=p
-	tries=10
 
 	if [ -n "$BENCHMARK" ]; then
 		alg="task"
 
-		p=`seq 1 48`' '64
+		# locally
+		p=`seq 1 4`
 		n=`print_power2 20`
+		# saturn
+		#p="1 2 `seq 3 3 48` 64"
+		#n=2147483648
 		run_it
 	fi
 	process
@@ -23,16 +26,16 @@ function cilk-n () {
 
 	id=n
 	p=0
-	tries=10
 	rnd_times=5
 	rnd_exp=28
 	rnd_seed=42
 
 	algos="data task"
 
-	n=`print_power2_seq 2 4`
-	#n=`print_power2_seq 1 26`' '`print_rand_seq`
-	#n=`seq 1 32`' '`print_power2_seq 5 31`
+	# locally
+	n=`print_power2_seq 10 12`
+	# saturn
+	#n="`print_power2_seq 1 2 26` `print_rand_seq`"
 	test-algos-n
 }
 
@@ -45,6 +48,7 @@ if [ -n "$BENCHMARK" ]; then
 
 	app="$wd/2-cilk-p1.exe"
 	proc_opt="--nproc"
+	tries=6
 fi
 
 cilk-task-speedup

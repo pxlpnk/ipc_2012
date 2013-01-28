@@ -8,7 +8,7 @@
 #include "cilk.h"
 #include "../../shared/util.h"
 
-#define MIN_OPS_PER_THREAD 1
+#define MIN_OPS_PER_THREAD 10000
 
 void EXPORT(datapara) (CilkContext *const ctx, ATYPE a[], uint n, uint t);
 void EXPORT(rec) (CilkContext *const ctx, ATYPE *a[], uint n);
