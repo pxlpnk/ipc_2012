@@ -324,3 +324,61 @@
 \label{res-tbl:3-falsesharingvarprocsA}
 }
 \end{table}
+
+%%% 100000x1000
+
+\begin{table}[h!]
+\centering
+\tiny{
+\setlength\tabcolsep{10pt} % wider table
+\pgfplotstabletypeset[
+	%sort, % done externally
+	header=true,
+	string type,
+	multicolumn names, % make siunitx happy
+	columns={id,med,min,avg,max},
+	assign column name/.code={%
+		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
+	},
+	columns/id/.style ={column name={\shortstack{Tasks}}, column type={S[scientific-notation=false,table-format=2]}, int detect},
+	columns/min/.style ={column name=Minimum,	column type=S},
+	columns/avg/.style ={column name=Average,	column type=S},
+	columns/med/.style ={column name=Median,	column type=S},
+	columns/max/.style ={column name=Maximum,	column type=S},
+	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
+	every last row/.style={after row=\bottomrule},
+	skip rows between index={1}{2},
+]{\tilingvarprocsB}
+  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{100000x1000 matrix}.}
+\label{res-tbl:3-tilingvarprocsB}
+}
+\end{table}
+
+%%% 100000x1000
+
+\begin{table}[h!]
+\centering
+\tiny{
+\setlength\tabcolsep{10pt} % wider table
+\pgfplotstabletypeset[
+	%sort, % done externally
+	header=true,
+	string type,
+	multicolumn names, % make siunitx happy
+	columns={id,med,min,avg,max},
+	assign column name/.code={%
+		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
+	},
+	columns/id/.style ={column name={\shortstack{Tasks}}, column type={S[scientific-notation=false,table-format=2]}, int detect},
+	columns/min/.style ={column name=Minimum,	column type=S},
+	columns/avg/.style ={column name=Average,	column type=S},
+	columns/med/.style ={column name=Median,	column type=S},
+	columns/max/.style ={column name=Maximum,	column type=S},
+	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
+	every last row/.style={after row=\bottomrule},
+	skip rows between index={1}{2},
+]{\falsesharingvarprocsB}
+  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{100000x1000 matrix}.}
+\label{res-tbl:3-falsesharingvarprocsB}
+}
+\end{table}
