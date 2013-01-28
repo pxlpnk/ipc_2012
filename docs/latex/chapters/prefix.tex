@@ -1,4 +1,20 @@
 \chapter{Prefix Sums}
+
+Since there was a prefix sum project in each assignment section we decided to do them all to get a good feeling how the used frameworks can cope with it and how differently one has to implement the same algorithms in them.
+
+For data preparation and checking the result we shared the same code between the projects which is of course comfortable, but such unification can also hide problems.
+
+One example we discovered was that (depending on the actual values in the array) the prefix sums easily overflow the data types normally used, without getting caught by our checking algorithm - in all projects.
+The checking algorithm uses the same data type\footnote{Namely \texttt{ATYPE} specifiable in all makefiles.} as the tested ones and hence overflows in the same manner.
+
+Checking for overflows in prefix sums is of course easy because they are monotonically increasing, but we refrained from that because the overflows do not change the timing and the correct values are as good as the wrong ones as long as the algorithm is correct in general.
+We did also use a single input generating function namely a counter to feed the algorithms with the same rationale: performance does not rely on the actual input.
+This has just been assumed though and we would like to hear from you if you disagree.
+
+All algorithms use \texttt{uint} as the type for counters and the user needs to take care of defining it sufficiently large in \texttt{util.h}.
+The default is \texttt{unsigned int} which should be good for the expected use cases with arrays smaller then $2^32$ elements.
+Most toolchains on modern computers use 64bit integers anyway and we did not do exhausting tests or analysis to find the exact limits.
+
 \section{OpenMP Prefix Sums}
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p1/seq-n.processed}\openmpprefixseqn
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p1/auxarr-n.processed}\openmpprefixauxarrn
