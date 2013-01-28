@@ -138,6 +138,9 @@ void compute_reduce_scatter(ATYPE *matrix, ATYPE *vector, ATYPE *result, int loc
       temp_result[j] = temp_result[j] + matrix[i*N+j] * vector[i];
     }
   }
+
+  MPI_Reduce_scatter(temp_result, result, recvcounts, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
 }
 
 
