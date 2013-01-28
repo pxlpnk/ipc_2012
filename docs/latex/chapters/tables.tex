@@ -500,3 +500,125 @@
 \label{res-tbl:3-tilingFixedNA}
 }
 \end{table}
+
+
+
+%% allgather fixed procsize
+
+\begin{table}[h!]
+\centering
+\tiny{
+\setlength\tabcolsep{10pt} % wider table
+\pgfplotstabletypeset[
+	%sort, % done externally
+	header=true,
+	string type,
+	multicolumn names, % make siunitx happy
+	columns={id,med,min,avg,max},
+	assign column name/.code={%
+		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
+	},
+	columns/id/.style ={column name={\shortstack{N}}, column type={S[scientific-notation=false,table-format=2]}, int detect},
+	columns/min/.style ={column name=Minimum,	column type=S},
+	columns/avg/.style ={column name=Average,	column type=S},
+	columns/med/.style ={column name=Median,	column type=S},
+	columns/max/.style ={column name=Maximum,	column type=S},
+	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
+	every last row/.style={after row=\bottomrule},
+	skip rows between index={1}{2},
+]{\AllgatherFixedProcs}
+\caption{Benchmark results showing the \textbf{MPI\_Allgather} implementation with \textbf{NEC-MPI} for a \textbf{fixed proc size of 10 } and a \textbf{variable N ( 100 500 1000 5000 10000 )}.}
+\label{res-tbl:3-allgatherFixedProc}
+}
+\end{table}
+
+
+%% reduce scatter fixed procsize
+
+\begin{table}[h!]
+\centering
+\tiny{
+\setlength\tabcolsep{10pt} % wider table
+\pgfplotstabletypeset[
+	%sort, % done externally
+	header=true,
+	string type,
+	multicolumn names, % make siunitx happy
+	columns={id,med,min,avg,max},
+	assign column name/.code={%
+		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
+	},
+	columns/id/.style ={column name={\shortstack{N}}, column type={S[scientific-notation=false,table-format=2]}, int detect},
+	columns/min/.style ={column name=Minimum,	column type=S},
+	columns/avg/.style ={column name=Average,	column type=S},
+	columns/med/.style ={column name=Median,	column type=S},
+	columns/max/.style ={column name=Maximum,	column type=S},
+	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
+	every last row/.style={after row=\bottomrule},
+	skip rows between index={1}{2},
+]{\ReduceScatterFixedProcs}
+\caption{Benchmark results showing the \textbf{MPI\_ReduceScatter} implementation with \textbf{NEC-MPI} for a \textbf{fixed proc size of 10 } and a \textbf{variable N ( 100 500 1000 5000 10000 )}.}
+\label{res-tbl:3-reduceScatterFixedProc}
+}
+\end{table}
+
+
+
+%% allgather variable procs
+
+\begin{table}[h!]
+\centering
+\tiny{
+\setlength\tabcolsep{10pt} % wider table
+\pgfplotstabletypeset[
+	%sort, % done externally
+	header=true,
+	string type,
+	multicolumn names, % make siunitx happy
+	columns={id,med,min,avg,max},
+	assign column name/.code={%
+		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
+	},
+	columns/id/.style ={column name={\shortstack{Procs }}, column type={S[scientific-notation=false,table-format=2]}, int detect},
+	columns/min/.style ={column name=Minimum,	column type=S},
+	columns/avg/.style ={column name=Average,	column type=S},
+	columns/med/.style ={column name=Median,	column type=S},
+	columns/max/.style ={column name=Maximum,	column type=S},
+	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
+	every last row/.style={after row=\bottomrule},
+	skip rows between index={1}{2},
+]{\AllgatherVariableProcs}
+\caption{Benchmark results showing the \textbf{MPI\_Allgather} implementation with \textbf{NEC-MPI} for a \textbf{variable proc size of 1..10 } and a \textbf{fixed N 10000}.}
+\label{res-tbl:3-allgatherVariableProc}
+}
+\end{table}
+
+
+%% reduce scatter variable procs
+
+\begin{table}[h!]
+\centering
+\tiny{
+\setlength\tabcolsep{10pt} % wider table
+\pgfplotstabletypeset[
+	%sort, % done externally
+	header=true,
+	string type,
+	multicolumn names, % make siunitx happy
+	columns={id,med,min,avg,max},
+	assign column name/.code={%
+		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
+	},
+	columns/id/.style ={column name={\shortstack{Procs}}, column type={S[scientific-notation=false,table-format=2]}, int detect},
+	columns/min/.style ={column name=Minimum,	column type=S},
+	columns/avg/.style ={column name=Average,	column type=S},
+	columns/med/.style ={column name=Median,	column type=S},
+	columns/max/.style ={column name=Maximum,	column type=S},
+	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
+	every last row/.style={after row=\bottomrule},
+	skip rows between index={1}{2},
+]{\ReduceScatterVariableProcs}
+\caption{Benchmark results showing the \textbf{MPI\_ReduceScatter} implementation with \textbf{NEC-MPI} for a \textbf{variable proc size of 1..10 } and a \textbf{fixed N 10000}.}
+\label{res-tbl:3-reduceScatterVariableProc}
+}
+\end{table}

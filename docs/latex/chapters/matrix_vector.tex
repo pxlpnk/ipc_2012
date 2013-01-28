@@ -344,3 +344,115 @@
 \caption{Benchmark results showing the different algorithms in \textbf{OpenMP} for a \textbf{fixed N } and a \textbf{variable M ( 10 100 500 1000 5000 10000 50000 100000 )}.  \autoref{res-tbl:3-tilingFixedNA} \autoref{res-tbl:3-falsesharingFixedNA}}
 \label{plot:1-1-n}
 \end{figure}
+
+
+
+\section{NEC MPI Matrix Vector Multiplication}
+
+
+
+
+%%% Fixed PROCS
+
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p3/allgather-fixed-procs-10.processed}\AllgatherFixedProcs
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p3/reduce-scatter-fixed-procs-10.processed}\ReduceScatterFixedProcs
+
+
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+  xlabel={N},
+	ylabel={Time [s]},
+	%legend columns=4,
+	%legend entries={data:,below median,median,above median,
+					%task:,below median,median,above median},
+	xmode=linear, ymode=log,
+	enlarge x limits=false,
+	axis on top,
+	legend transposed =true,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	%reverse legend,
+	ymin=0,
+	]
+
+	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\AllgatherFixedProcs};
+	\addlegendentry{{MPI\_Allgather min}}
+	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\AllgatherFixedProcs};
+	\addlegendentry{{MPI\_Allgather med}}
+  \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\AllgatherFixedProcs};
+	\addlegendentry{{MPI\_Allgather max}}
+
+	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\ReduceScatterFixedProcs};
+	\addlegendentry{{MPI\_ReduceScatter min}}
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\ReduceScatterFixedProcs};
+	\addlegendentry{{MPI\_ReduceScatter med}}
+  \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\ReduceScatterFixedProcs};
+	\addlegendentry{{MPI\_ReduceScatter max}}
+
+	%\resetstackedplots
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing the \textbf{MPI\_Allgather and MPI\_ReduceScatter} implementations with \textbf{NEC-MPI} for a \textbf{fixed proc size of 10 } and a \textbf{variable N ( 100 500 1000 5000 10000 )}.  \autoref{res-tbl:3-allgatherFixedProc} \autoref{res-tbl:3-reduceScatterFixedProc}}
+\label{plot:1-1-n}
+\end{figure}
+
+
+%%% VARIABLE PROCS 1..10
+
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p3/allgather-variable-procs-10000.processed}\AllgatherVariableProcs
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p3/reduce-scatter-variable-procs-10000.processed}\ReduceScatterVariableProcs
+
+
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+  xlabel={Procs},
+	ylabel={Time [s]},
+	%legend columns=4,
+	%legend entries={data:,below median,median,above median,
+					%task:,below median,median,above median},
+	xmode=linear, ymode=log,
+	enlarge x limits=false,
+	axis on top,
+	legend transposed =true,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	%reverse legend,
+	ymin=0,
+	]
+
+	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\AllgatherVariableProcs};
+	\addlegendentry{{MPI\_Allgather min}}
+	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\AllgatherVariableProcs};
+	\addlegendentry{{MPI\_Allgather med}}
+  \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\AllgatherVariableProcs};
+	\addlegendentry{{MPI\_Allgather max}}
+
+	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\ReduceScatterVariableProcs};
+	\addlegendentry{{MPI\_ReduceScatter min}}
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\ReduceScatterVariableProcs};
+	\addlegendentry{{MPI\_ReduceScatter med}}
+  \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\ReduceScatterVariableProcs};
+	\addlegendentry{{MPI\_ReduceScatter max}}
+
+	%\resetstackedplots
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing the \textbf{MPI\_Allgather and MPI\_ReduceScatter} implementations with \textbf{NEC-MPI} for a \textbf{fixed size N of 10000 } and \textbf{( variable procs 1..10 )}.  \autoref{res-tbl:3-allgatherVariableProc} \autoref{res-tbl:3-reduceScatterVariableProc}}
+\label{plot:1-1-n}
+\end{figure}
