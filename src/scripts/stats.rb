@@ -9,7 +9,7 @@
 class Array
   def to_csv
 #    "#{self.join(",")}\n"
-    "#{self.a.map{ |f| "%5.6f" % [f] }.join(",")}\n"
+    "#{self.map{ |f| "%5.6f" % [f] }.join(",")}\n"
   end
 end
 module Enumerable
