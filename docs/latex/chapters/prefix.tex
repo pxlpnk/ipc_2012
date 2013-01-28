@@ -12,10 +12,20 @@ We did also use a single input generating function namely a counter to feed the 
 This has just been assumed though and we would like to hear from you if you disagree.
 
 All algorithms use \texttt{uint} as the type for counters and the user needs to take care of defining it sufficiently large in \texttt{util.h}.
-The default is \texttt{unsigned int} which should be good for the expected use cases with arrays smaller then $2^32$ elements.
+The default is \texttt{unsigned int} which should be good for the expected use cases with arrays smaller then $2^{32}$ elements.
 Most toolchains on modern computers use 64bit integers anyway and we did not do exhausting tests or analysis to find the exact limits.
 
+The makefiles allow to leave out all \texttt{printfs} via their \texttt{fast} target which was used for benchmarking.
+The default compile target is \texttt{debug} which enables all \texttt{printfs} and debug symbols.
+
 \section{OpenMP Prefix Sums}
+
+The first project was to implement three ``major'' parallel prefix sum algorithms: the one using an auxiliary array, one that does not need this and the more sophisticated one presented by Hillis et al.
+The assignment required to implement \textbf{non-invasive} ``performance counters'' in a quite complicated way, but we decided to use reduction clauses only because they are very convenient to work with and if measuring the operations needs to be done in a less invasive manner we would suggest to compile the probing interface out with preprocessor directives instead of trying to make it as fast as possible.
+
+The OpenMP proved to be very easy to work with: the pragmas are easy to learn and use and the tool chain support was sufficient and uncomplicated.
+
+
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p1/seq-n.processed}\openmpprefixseqn
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p1/auxarr-n.processed}\openmpprefixauxarrn
 \pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p1/inplace-n.processed}\openmpprefixinplacen
@@ -68,6 +78,17 @@ Most toolchains on modern computers use 64bit integers anyway and we did not do 
 
 
 \section{Cilk Prefix Sums}
+
+For the Cilk project we had to come up with a task-parallel algorithm on our own and implement one of the ones previously used with OpenMP by using the data parallel construct from the lecture.
+We chose to base both on the inplace algorithm but for the latter we did not use the abstracted data parallel construct but interwove it with the algorithm directly.
+
+The task-parallel algorithm we used a typical recursive divide and conquer approach which allows for quite some parallelism but which was very hard to do right for all $n$.
+We failed to come up with a proper solution and decided to solve this problem by rounding up to the next power of 2 before actually calling our algorithm.
+The data-parallel algorithm does work with all $n$ but it was also quite tricky to accomplish this and the vast number of debug printfs are the (not so?) silent witnesses.
+
+The Cilk framework in the form used by the lecture was abandoned after Intel bought the copyrights.
+This missing maintenance and drawbacks in usability (C89 only, lots of bugs) are very annoying additionally to the unorthodox and hardly to grasp task-parallel concept (at least for us).
+
 \pgfplotstableread[format=file,col sep=comma]{../../../data/2-cilk/p1/task-n.processed}\cilktaskn
 \pgfplotstableread[format=file,col sep=comma]{../../../data/2-cilk/p1/data-n.processed}\cilkdatan
 \pgfplotstableread[format=file,col sep=comma]{../../../data/2-cilk/p1/task-speedup.processed}\cilkspeedup
@@ -137,7 +158,21 @@ Most toolchains on modern computers use 64bit integers anyway and we did not do 
 \label{plot:2-speedup}
 \end{figure}
 
+
 \section{MPI Prefix Sums}
+
+For this assignment we had to compare three different algorithms: the simple sequential one and two versions of the algorithm laid out in the assignment.
+The algorithm in the slides assumes the array to be already distributed to all hosts.
+We actually prepare the full array in all processes and use only the block dedicated to that host respectively.
+The benchmarking starts by taking a timestamp and the blocks are solved in parallel by all hosts first until they have to communicate.
+Here the two algorithms differentiate into one version that just calls \texttt{MPI\_Exscan} and one that implements this manually.
+This was straight forward to implement after figuring out how to map the operations on the array to data transfers between the hosts.
+After that both algorithms trivialy fix their local block by adding the prefix sum of the previous block and benchmarking stops.
+
+The results are quite interesting:
+They show the huge overhead of MPI communication in general and especially between the nodes over Infiniband when comparing the timing of the sequential algorithm with the MPI-enabled ones when running on multiple nodes.
+Also they suggest that our custom implementation of \texttt{MPI\_Exscan} is very competitive at least for large inputs.
+
 \pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/custom-speedup-100000.processed}\mpiprefixonehundredkcustom
 \pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/native-speedup-100000.processed}\mpiprefixonehundredknative
 \pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/seq-speedup-100000.processed}\mpiprefixonehundredkseq
@@ -182,7 +217,6 @@ Most toolchains on modern computers use 64bit integers anyway and we did not do 
 \end{figure}
 
 
-
 \pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/custom-speedup-2_pow_24.processed}\mpiprefixpowtwentyfourcustom
 \pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/native-speedup-2_pow_24.processed}\mpiprefixpowtwentyfournative
 \pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/seq-speedup-2_pow_24.processed}\mpiprefixpowtwentyfourseq
@@ -225,7 +259,6 @@ Most toolchains on modern computers use 64bit integers anyway and we did not do 
 \caption{Benchmark results showing \textbf{run time per number of threads} of the different algorithms in \textbf{MPI} for $n=2^{24}$. Raw data can be found in the appendix: \autoref{res-tbl:3-2-custom-pow24} \autoref{res-tbl:3-2-native-pow24} \autoref{res-tbl:3-2-seq-pow24}}
 \label{plot:3-2-n}
 \end{figure}
-
 
 
 \pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/custom-speedup-2_pow_26.processed}\mpiprefixpowtwentysixcustom
