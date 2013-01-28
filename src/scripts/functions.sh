@@ -11,7 +11,7 @@ function print_power2_seq () { # print 2^$1 till 2^$2 (inclusive)
 
 function print_rand_seq () { # print $rnd_times times 2^<random> <= 2^$rnd_exp, seeded by $rnd_seed
 	if [ -z "$rnd_seed" -o -z "$rnd_times" -o -z "$rnd_exp" ]; then
-		echo "missing parameter"
+		echo "print_rand_seq: missing parameter"
 		exit 1
 	fi
 	RANDOM=$rnd_seed
@@ -31,7 +31,7 @@ function print_rand_seq () { # print $rnd_times times 2^<random> <= 2^$rnd_exp, 
 
 function run_it () {
 	if [ -z "$tries" -o -z "$app" -o -z "$proc_opt" -o -z "$alg" -o -z "$p" -o -z "$n" -o -z "$logfile" ]; then
-		echo "missing parameter"
+		echo "run_it: missing parameter"
 		exit 1
 	fi
 	if [ -n "$CLEAN" ]; then
@@ -57,7 +57,7 @@ function run_it () {
 
 function process () {
 	if [ -z "$SCRIPTDIR" -o -z "$logfile" ]; then
-		echo "missing parameter"
+		echo "process: missing parameter"
 		exit 1
 	fi
 	if [ -n "$CLEAN" ]; then
