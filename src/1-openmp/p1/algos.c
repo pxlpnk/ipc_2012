@@ -94,6 +94,7 @@ void auxarr(ATYPE *x, uint n, uint *opsp) {
 		}
 	} // implicit barrier
 
+	free(tmp);
 	*opsp = ops;
 }
 
@@ -120,6 +121,7 @@ void hillis(ATYPE **arr, uint n, uint *opsp) {
 		t = x; x = y; y = t; // swap
 	}
 
+	free(y);
 	*opsp = ops;
 	*arr = x;
 }
