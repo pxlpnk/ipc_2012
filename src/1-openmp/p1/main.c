@@ -106,11 +106,9 @@ int main (int argc, char *argv[]) {
 		usage_abort();
 	}
 
-	if (t > 1) {
-		printf("this program does not support more than 1 thread!\n");
-		usage_abort();
+	if (t > 0) {
+		omp_set_num_threads(t);
 	}
-	omp_set_num_threads(1);
 
 
 	ATYPE *arr = malloc(sizeof(ATYPE) * n);
