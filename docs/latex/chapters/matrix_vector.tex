@@ -188,7 +188,7 @@
 
 	  \end{axis}
   \end{tikzpicture}
-  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{100000x1000 matrix}. Raw data can be found in the appendix: \autoref{res-tbl:3-tilingvarprocsB}}
+  \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{100000x1000 matrix}.  \autoref{res-tbl:3-tilingvarprocsB}}
   \label{plot:3-falsesharingvarprocsB}
 \end{figure}
 
@@ -231,6 +231,55 @@
 
 	\end{axis}
 \end{tikzpicture}
-\caption{Benchmark results showing the different algorithms in \textbf{OpenMP}. Raw data can be found in the appendix: \autoref{res-tbl:1-1-seq-n} \autoref{res-tbl:1-1-auxarr-n} \autoref{res-tbl:1-1-inplace-n}}
+\caption{Benchmark results showing the different algorithms in \textbf{OpenMP}. \autoref{res-tbl:3-tilingvarprocsB} \autoref{res-tbl:3-falsesharingvarprocsB}}
+\label{plot:1-1-n}
+\end{figure}
+
+
+
+%%%%%%%%%% VARIABLE N
+
+
+\pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p2/tiling-fixed-m-100000.processed}\falsesharingFixedMA
+\pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p2/false-sharing-fixed-m-100000.processed}\tilingFixedMA
+
+
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+  xlabel={N},
+	ylabel={Time [s]},
+	%legend columns=4,
+	%legend entries={data:,below median,median,above median,
+					%task:,below median,median,above median},
+	xmode=linear, ymode=linear,
+	enlarge x limits=false,
+	axis on top,
+	legend transposed =true,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	%reverse legend,
+	ymin=0,
+	]
+
+	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingFixedMA};
+	\addlegendentry{{False Sharing. minimum}}
+	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingFixedMA};
+	\addlegendentry{{False Sharing. median}}
+	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingFixedMA};
+	\addlegendentry{{Tiling. minimum}}
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingFixedMA};
+	\addlegendentry{{Tiling. median}}
+	%\resetstackedplots
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing the different algorithms in \textbf{OpenMP} for a \textbf{fixed M } and a \textbf{variable N ( 10 100 500 1000 5000 10000 50000 100000 )}.  \autoref{res-tbl:3-tilingFixedMA} \autoref{res-tbl:3-falsesharingFixedMA}}
 \label{plot:1-1-n}
 \end{figure}
