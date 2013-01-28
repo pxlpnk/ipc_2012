@@ -7,15 +7,17 @@ function openmp-n () {
 	p=0
 	tries=10
 	rnd_times=5
-	rnd_exp=28
+	rnd_exp=31
 	rnd_seed=42
 
 	#algos="seq reduction inplace auxarr hillis"
-	algos="seq inplace auxarr"
+	algos="seq inplace auxarr hillis"
 
+	# locally
 	n=`print_power2_seq 18 20`
+	# saturn
 	#n=`print_power2_seq 18 26`' '`print_rand_seq`
-	#n=`seq 1 32`' '`print_power2_seq 5 31`
+
 	test-algos-n
 }
 
