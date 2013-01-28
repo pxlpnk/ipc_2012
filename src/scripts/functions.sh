@@ -11,7 +11,7 @@ function print_power2_seq () { # print 2^$1 till 2^$2 (inclusive)
 
 function print_rand_seq () { # print $rnd_times times 2^<random> <= 2^$rnd_exp, seeded by $rnd_seed
 	if [ -z "$rnd_seed" -o -z "$rnd_times" -o -z "$rnd_exp" ]; then
-		echo "missing parameter"
+		echo "print_rand_seq: missing parameter"
 		exit 1
 	fi
 	RANDOM=$rnd_seed
@@ -29,29 +29,27 @@ function print_rand_seq () { # print $rnd_times times 2^<random> <= 2^$rnd_exp, 
 	done
 }
 
-function test_it () {
-	if [ -z "$tries" -o -z "$app" -o -z "$proc_opt" -o -z "$algos" -o -z "$p" -o -z "$n" -o -z "$logfile" ]; then
-		echo "missing parameter"
+function run_it () {
+	if [ -z "$tries" -o -z "$app" -o -z "$proc_opt" -o -z "$alg" -o -z "$p" -o -z "$n" -o -z "$logfile" ]; then
+		echo "run_it: missing parameter"
 		exit 1
 	fi
 	if [ -n "$CLEAN" ]; then
 		rm -f "$logfile"
 	fi
 	mkdir -p `dirname "$logfile"`
-	for alg in $algos; do
-		for N in $n; do
-			for NPROC in $p; do
-				cli="$app $proc_opt $NPROC -a $alg -n $N -f $logfile -i $id"
-				echo "Testing '$cli' $tries times"
-				for x in `seq 1 $tries`; do
-					$cli
-					#echo "$cli"
-					bla=$?
-					if [[ ! $bla -eq 0 ]]; then
-						echo "'$cli' failed: $bla"
-						exit $bla
-					fi
-				done
+	for N in $n; do
+		for NPROC in $p; do
+			cli="$app $proc_opt $NPROC -a $alg -n $N -f $logfile -i $id"
+			echo "Testing '$cli' $tries times"
+			for x in `seq 1 $tries`; do
+				$cli
+				#echo "$cli"
+				bla=$?
+				if [[ ! $bla -eq 0 ]]; then
+					echo "'$cli' failed: $bla"
+					exit $bla
+				fi
 			done
 		done
 	done
@@ -59,7 +57,7 @@ function test_it () {
 
 function process () {
 	if [ -z "$SCRIPTDIR" -o -z "$logfile" ]; then
-		echo "missing parameter"
+		echo "process: missing parameter"
 		exit 1
 	fi
 	if [ -n "$CLEAN" ]; then
@@ -73,6 +71,20 @@ function process () {
 		exit $bla
 	fi
 	echo "done"
+}
+
+function test-algos-n () { # calls run_it and process for every alg in $algos
+	if [ -z "$dir" -o -z "$algos" ]; then
+		echo "test-algos-n: missing parameter"
+		exit 1
+	fi
+	for alg in $algos; do
+		logfile="$GITROOT/data/$dir/$alg-n"
+		if [ -n "$BENCHMARK" ]; then
+			run_it
+		fi
+		process
+	done
 }
 
 OCWD=`pwd`
