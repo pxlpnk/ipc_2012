@@ -15,7 +15,7 @@ function cilk-task-speedup () {
 		n=`print_power2 20`
 		# saturn
 		#p="1 2 `seq 3 3 48` 64"
-		#n=2147483648
+		#n=`print_power2 28`
 		run_it
 	fi
 	process
@@ -35,7 +35,7 @@ function cilk-n () {
 	# locally
 	n=`print_power2_seq 10 12`
 	# saturn
-	#n="`print_power2_seq 1 2 26` `print_rand_seq`"
+	#n="`print_power2_seq 14 2 26` `print_rand_seq`"
 	test-algos-n
 }
 
