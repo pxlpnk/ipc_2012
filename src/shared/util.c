@@ -61,6 +61,12 @@ uint prefixSums(ATYPE *arr, uint n, bool exclusive, ATYPE * sums) {
 	return sum;
 }
 
+void printArrsElem(ATYPE *a, ATYPE *b, uint i) {
+	  printf("[%03d]:\t%p@  %" ATYPEPRINT, i, (void*)(a+i), a[i]);
+	  printf("\t%s    ", (a[i] != b[i]) ? "!=    " : "      ");
+	  printf("%" ATYPEPRINT "  @%p\n", b[i], (void*)(b+i));
+}
+
 void printArray(ATYPE *a, uint n) {
 	uint i;
 	for (i = 0; i < n; i++) {
@@ -71,11 +77,9 @@ void printArray(ATYPE *a, uint n) {
 
 void printArrs(ATYPE *a, ATYPE *b, uint n) {
 	uint i;
-	printf("arrays at %p and %p\n", a, b);
+	printf("arrays at %p and %p\n", (void*)a, (void*)b);
 	for (i = 0; i < n; i++) {
-		printf("[%03d]:\t%p@  %" ATYPEPRINT, i, a+i, a[i]);
-		printf("\t%s    ", (a[i] != b[i]) ? "!=    " : "      ");
-		printf("%" ATYPEPRINT "  @%p\n", b[i], b+i);
+		printArrsElem(a, b, i);
 	}
 	printf("\n");
 }

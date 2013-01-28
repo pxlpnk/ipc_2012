@@ -129,6 +129,8 @@ int main (int argc, char *argv[]) {
 
 	if (n < 100)
 		printArrs(cor, arr, n);
+	else
+		printArrsElem(cor, arr, n-1);
 
 	ret = memcmp(cor, arr, sizeof(ATYPE) * n);
 
