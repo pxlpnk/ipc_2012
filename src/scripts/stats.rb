@@ -133,7 +133,7 @@ if __FILE__ == $0
 
   if @files.empty?
     puts usage
-    exit
+    exit 1
   end
 
   data = prepare_data(@files)
