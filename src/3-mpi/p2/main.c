@@ -151,6 +151,8 @@ int main(int argc, char *argv[])
 	if (rank == 0) {
 		if (n < 100)
 			printArrs(cor, arr, n);
+		else
+			printArrsElem(cor, arr, n-1);
 
 		printf("Correct? ");
 		if (memcmp(cor, arr, sizeof(ATYPE) * n) == 0) {

@@ -43,6 +43,9 @@ uint prefixSums(ATYPE *arr, uint n, bool exclusive, ATYPE * sums);
 /* print the array with indices */
 void printArray(ATYPE *a, uint n);
 
+/* compares and prints a single element of two arrays */
+void printArrsElem(ATYPE *a, ATYPE *b, uint i);
+
 /* print two arrays side by side with indices and show differences in elements */
 void printArrs(ATYPE *a, ATYPE *b, uint n);
 
