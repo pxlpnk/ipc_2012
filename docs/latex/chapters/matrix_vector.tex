@@ -289,3 +289,58 @@
 \caption{Benchmark results showing the different algorithms in \textbf{OpenMP} for a \textbf{fixed M } and a \textbf{variable N ( 10 100 500 1000 5000 10000 50000 100000 )}.  \autoref{res-tbl:3-tilingFixedMA} \autoref{res-tbl:3-falsesharingFixedMA}}
 \label{plot:1-1-n}
 \end{figure}
+
+
+%%%%%%%%%% VARIABLE M
+
+
+
+\pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p2/tiling-fixed-n-100000.processed}\falsesharingFixedNA
+\pgfplotstableread[format=file,col sep=comma]{../../../data/1-openmp/p2/false-sharing-fixed-n-100000.processed}\tilingFixedNA
+
+
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+  xlabel={M},
+	ylabel={Time [s]},
+	%legend columns=4,
+	%legend entries={data:,below median,median,above median,
+					%task:,below median,median,above median},
+	xmode=linear, ymode=linear,
+	enlarge x limits=false,
+	axis on top,
+	legend transposed =true,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	%reverse legend,
+	ymin=0,
+	]
+
+	\addplot [fill=none, draw=blue, thick]	table [x=id, y=min]		{\falsesharingFixedNA};
+	\addlegendentry{{False Sharing. minimum}}
+	\addplot [draw=blue, loosely dotted, thick]	table [x=id, y=med]		{\falsesharingFixedNA};
+	\addlegendentry{{False Sharing. median}}
+  \addplot [fill=none, draw=blue, dashed, thick]	table [x=id, y=max]		{\falsesharingFixedNA};
+	\addlegendentry{{False Sharing. maximum}}
+
+	\addplot [fill=none, draw=red, thick]	table [x=id, y=min]		{\tilingFixedNA};
+	\addlegendentry{{Tiling. minimum}}
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]		{\tilingFixedNA};
+	\addlegendentry{{Tiling. median}}
+  \addplot [draw=red, dashed, thick]		table [x=id, y=max]		{\tilingFixedNA};
+	\addlegendentry{{Tiling. maximum}}
+
+	%\resetstackedplots
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing the different algorithms in \textbf{OpenMP} for a \textbf{fixed N } and a \textbf{variable M ( 10 100 500 1000 5000 10000 50000 100000 )}.  \autoref{res-tbl:3-tilingFixedNA} \autoref{res-tbl:3-falsesharingFixedNA}}
+\label{plot:1-1-n}
+\end{figure}
