@@ -1,5 +1,10 @@
 #!/bin/bash
 
+function print_power2 () { # print 2^$1
+	i=`awk "BEGIN {print 2^$1}"`
+	echo $i
+}
+
 function print_power2_seq () { # print 2^$1 till 2^$2 (inclusive)
 	i=`awk "BEGIN {print 2^$1}"`
 	end=`awk "BEGIN {print 2^$2}"`

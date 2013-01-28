@@ -6,14 +6,13 @@ function cilk-task-speedup () {
 	logfile="$GITROOT/data/$dir/task-speedup"
 
 	id=p
-	p=0
 	tries=10
 
 	if [ -n "$BENCHMARK" ]; then
 		alg="task"
 
-		n=`print_power2_seq 20 20`
 		p=`seq 1 48`' '64
+		n=`print_power2 20`
 		run_it
 	fi
 	process
