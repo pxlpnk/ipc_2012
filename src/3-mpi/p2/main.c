@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 			else if (strcmp(optarg, "n") == 0)
 				id = en;
 			else {
-				fprintf(stderr, "Invalid ID: %s\n", optarg);
+				mpi_printf(root, "Invalid ID: %s\n", optarg);
 				usage_abort();
 			}
 			break;
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (optind < argc) {
-		fprintf(stderr, "Warning: Extra parameters found.\n");
+		mpi_printf(root, "Warning: Extra parameters found.\n");
 	}
 
 	if (n == 0) {
@@ -132,12 +132,13 @@ int main(int argc, char *argv[])
 	}
 
 	if (f != NULL && id == none) {
-		fprintf(stderr, "Legal ID required!\n");
+		mpi_printf(root, "Legal ID required!\n");
 		usage_abort();
 	}
 
 	ATYPE *arr = malloc(sizeof(ATYPE) * n);
 	if (arr == NULL) {
+		mpi_printf(root, "Out of memory.\n");
 		ret = EXIT_FAILURE;
 		goto out_mpi;
 	}
@@ -146,6 +147,7 @@ int main(int argc, char *argv[])
 
 	ATYPE *cor = malloc(sizeof(ATYPE) * n);
 	if (cor == NULL) {
+		mpi_printf(root, "Out of memory.\n");
 		ret = EXIT_FAILURE;
 		goto out_arr;
 	}
@@ -164,10 +166,10 @@ int main(int argc, char *argv[])
 	double totaltime = MPI_Wtime() - inittime;
 	double mytime = totaltime;
 	MPI_Reduce(&mytime, &totaltime, 1, MPI_DOUBLE, MPI_MAX, root, comm);
+	mpi_printf(root, "time used: %f \n", totaltime);
 
 	/* gather results at root node */
 	if (rank == root) {
-		printf("time used: %f \n", totaltime);
 		int rcount[size];
 		int rdisp[size];
 		uint i = 0;
