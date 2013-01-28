@@ -97,6 +97,9 @@ OCWD=`pwd`
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TIMESTAMP=`date "+%Y%m%d-%H%M"`
 GITROOT=`git rev-parse --show-toplevel`
+if [ -z $GITROOT ]; then
+	GITROOT="~/git"
+fi
 
 function usage () {
 cat << EOF
