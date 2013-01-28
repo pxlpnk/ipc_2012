@@ -450,11 +450,13 @@ As data structure for the matrix an array of the length \texttt{N*N} was used so
 
   for ( int i = 0 ; i < partition ; ++i ){
     for ( int j = 0 ; j < N ; ++j ){
-      temp_result[j] = temp_result[j] + matrix[i*N+j] * vector[i];
+      temp_result[j] = temp_result[j] +
+                       matrix[i*N+j] * vector[i];
     }
   }
   MPI_Reduce_scatter(temp_result, result,
-                     recvcounts, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                     recvcounts, MPI_INT,
+                     MPI_SUM, MPI_COMM_WORLD);
 \end{lstlisting}
 
 \subsection{Testing}
