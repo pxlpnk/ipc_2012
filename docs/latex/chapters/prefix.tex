@@ -117,9 +117,9 @@
 \end{figure}
 
 \section{MPI Prefix Sums}
-\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/custom-n.processed}\openmpprefixcustomn
-\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/native-n.processed}\openmpprefixnativen
-\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/seq-n.processed}\openmpprefixseqn
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/custom-speedup-100000.processed}\mpiprefixonehundredkcustom
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/native-speedup-100000.processed}\mpiprefixonehundredknative
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/seq-speedup-100000.processed}\mpiprefixonehundredkseq
 
 \begin{figure}[h!]
 \centering
@@ -138,23 +138,159 @@
 	},
 	%reverse legend,
 	ymin=0,
+	xmin=0,
 	]
 
-	\addplot [fill=none, draw=blue, thick]			table [x=id, y=min]	{\openmpprefixseqn};
+	\addplot [fill=none, draw=blue, thick,			domain=1:560]		{0.000553};
 	\addlegendentry{{Seq. minimum}}
-	\addplot [draw=blue, loosely dotted, thick]		table [x=id, y=med]	{\openmpprefixseqn};
+	\addplot [draw=blue, loosely dotted, thick,		domain=1:560]		{0.000554};
 	\addlegendentry{{Seq. median}}
-	\addplot [fill=none, draw=red, thick]			table [x=id, y=min]	{\openmpprefixcustomn};
+	\addplot [fill=none, draw=red, thick]			table [x=id, y=min]	{\mpiprefixonehundredkcustom};
 	\addlegendentry{{Custom minimum}}
-	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]	{\openmpprefixcustomn};
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]	{\mpiprefixonehundredkcustom};
 	\addlegendentry{{Custom median}}
-	\addplot [fill=none, draw=green, thick]			table [x=id, y=min]	{\openmpprefixnativen};
+	\addplot [fill=none, draw=green, thick]			table [x=id, y=min]	{\mpiprefixonehundredknative};
 	\addlegendentry{{Native minimum}}
-	\addplot [draw=green, loosely dotted, thick]	table [x=id, y=med]	{\openmpprefixnativen};
+	\addplot [draw=green, loosely dotted, thick]	table [x=id, y=med]	{\mpiprefixonehundredknative};
 	\addlegendentry{{Native median}}
 
 	\end{axis}
 \end{tikzpicture}
-\caption{Benchmark results showing \textbf{run time per instance size} of the different algorithms in \textbf{MPI}. Raw data can be found in the appendix: \autoref{res-tbl:3-2-seq-n} \autoref{res-tbl:3-2-custom-n} \autoref{res-tbl:3-2-native-n}}
+\caption{Benchmark results showing \textbf{run time per number of threads} of the different algorithms in \textbf{MPI} for $n=100000$. Raw data can be found in the appendix: \autoref{res-tbl:3-2-custom-100k} \autoref{res-tbl:3-2-native-100k} \autoref{res-tbl:3-2-seq-100k}}
+\label{plot:3-2-n}
+\end{figure}
+
+
+
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/custom-speedup-2_pow_24.processed}\mpiprefixpowtwentyfourcustom
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/native-speedup-2_pow_24.processed}\mpiprefixpowtwentyfournative
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/seq-speedup-2_pow_24.processed}\mpiprefixpowtwentyfourseq
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+	xlabel={Instance Size [array elements]},
+	ylabel={Time [s]},
+	xmode=log, ymode=log,
+	enlarge x limits=false,
+	axis on top,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	%reverse legend,
+	ymin=0,
+	xmin=0,
+	]
+
+	\addplot [fill=none, draw=blue, thick,			domain=1:560]		{0.058419};
+	\addlegendentry{{Seq. minimum}}
+	\addplot [draw=blue, loosely dotted, thick,		domain=1:560]		{0.059347};
+	\addlegendentry{{Seq. median}}
+	\addplot [fill=none, draw=red, thick]			table [x=id, y=min]	{\mpiprefixpowtwentyfourcustom};
+	\addlegendentry{{Custom minimum}}
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]	{\mpiprefixpowtwentyfourcustom};
+	\addlegendentry{{Custom median}}
+	\addplot [fill=none, draw=green, thick]			table [x=id, y=min]	{\mpiprefixpowtwentyfournative};
+	\addlegendentry{{Native minimum}}
+	\addplot [draw=green, loosely dotted, thick]	table [x=id, y=med]	{\mpiprefixpowtwentyfournative};
+	\addlegendentry{{Native median}}
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing \textbf{run time per number of threads} of the different algorithms in \textbf{MPI} for $n=2^{24}$. Raw data can be found in the appendix: \autoref{res-tbl:3-2-custom-pow24} \autoref{res-tbl:3-2-native-pow24} \autoref{res-tbl:3-2-seq-pow24}}
+\label{plot:3-2-n}
+\end{figure}
+
+
+
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/custom-speedup-2_pow_26.processed}\mpiprefixpowtwentysixcustom
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/native-speedup-2_pow_26.processed}\mpiprefixpowtwentysixnative
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/seq-speedup-2_pow_26.processed}\mpiprefixpowtwentysixseq
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+	xlabel={Instance Size [array elements]},
+	ylabel={Time [s]},
+	xmode=log, ymode=log,
+	enlarge x limits=false,
+	axis on top,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	%reverse legend,
+	ymin=0,
+	xmin=0,
+	]
+
+	\addplot [fill=none, draw=blue, thick,			domain=1:560]		{0.246854};
+	\addlegendentry{{Seq. minimum}}
+	\addplot [draw=blue, loosely dotted, thick,		domain=1:560]		{0.2548015};
+	\addlegendentry{{Seq. median}}
+	\addplot [fill=none, draw=red, thick]			table [x=id, y=min]	{\mpiprefixpowtwentysixcustom};
+	\addlegendentry{{Custom minimum}}
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]	{\mpiprefixpowtwentysixcustom};
+	\addlegendentry{{Custom median}}
+	\addplot [fill=none, draw=green, thick]			table [x=id, y=min]	{\mpiprefixpowtwentysixnative};
+	\addlegendentry{{Native minimum}}
+	\addplot [draw=green, loosely dotted, thick]	table [x=id, y=med]	{\mpiprefixpowtwentysixnative};
+	\addlegendentry{{Native median}}
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing \textbf{run time per number of threads} of the different algorithms in \textbf{MPI} for $n=2^{26}$. Raw data can be found in the appendix: \autoref{res-tbl:3-2-custom-pow26} \autoref{res-tbl:3-2-native-pow26} \autoref{res-tbl:3-2-seq-pow26}}
+\label{plot:3-2-n}
+\end{figure}
+
+
+
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/custom-speedup-2_pow_28.processed}\mpiprefixpowtwentyeightcustom
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/native-speedup-2_pow_28.processed}\mpiprefixpowtwentyeightnative
+\pgfplotstableread[format=file,col sep=comma]{../../../data/3-mpi/p2/seq-speedup-2_pow_28.processed}\mpiprefixpowtwentyeightseq
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	width=0.8\linewidth,
+	xlabel={Instance Size [array elements]},
+	ylabel={Time [s]},
+	xmode=log, ymode=log,
+	enlarge x limits=false,
+	axis on top,
+	legend style={
+		draw=none,
+		cells={anchor=west},
+		legend pos=outer north east,
+	},
+	%reverse legend,
+	ymin=0,
+	xmin=0,
+	]
+
+	\addplot [fill=none, draw=blue, thick,			domain=1:560]		{0.845252};
+	\addlegendentry{{Seq. minimum}}
+	\addplot [draw=blue, loosely dotted, thick,		domain=1:560]		{0.950762};
+	\addlegendentry{{Seq. median}}
+	\addplot [fill=none, draw=red, thick]			table [x=id, y=min]	{\mpiprefixpowtwentyeightcustom};
+	\addlegendentry{{Custom minimum}}
+	\addplot [draw=red, loosely dotted, thick]		table [x=id, y=med]	{\mpiprefixpowtwentyeightcustom};
+	\addlegendentry{{Custom median}}
+	\addplot [fill=none, draw=green, thick]			table [x=id, y=min]	{\mpiprefixpowtwentyeightnative};
+	\addlegendentry{{Native minimum}}
+	\addplot [draw=green, loosely dotted, thick]	table [x=id, y=med]	{\mpiprefixpowtwentyeightnative};
+	\addlegendentry{{Native median}}
+
+	\end{axis}
+\end{tikzpicture}
+\caption{Benchmark results showing \textbf{run time per number of threads} of the different algorithms in \textbf{MPI} for $n=2^{28}$. Raw data can be found in the appendix: \autoref{res-tbl:3-2-custom-pow28} \autoref{res-tbl:3-2-native-pow28} \autoref{res-tbl:3-2-seq-pow28}}
 \label{plot:3-2-n}
 \end{figure}
