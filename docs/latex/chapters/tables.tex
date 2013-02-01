@@ -39,7 +39,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\openmpprefixseqn}
 \caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Sequential algorithm} in \textbf{OpenMP}.}
 \label{res-tbl:1-1-seq-n}
@@ -66,7 +65,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\openmpprefixauxarrn}
 \caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Auxiliary Array algorithm} in \textbf{OpenMP}.}
 \label{res-tbl:1-1-auxarr-n}
@@ -93,7 +91,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\openmpprefixinplacen}
 \caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Inplace algorithm} in \textbf{OpenMP}.}
 \label{res-tbl:1-1-inplace-n}
@@ -120,14 +117,13 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\openmpprefixhillisn}
 \caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Hillis algorithm} in \textbf{OpenMP}.}
 \label{res-tbl:1-1-hillis-n}
 }
 \end{table}
 
-
+\clearpage
 \section{Cilk Prefix Sums}
 
 \begin{table}[h!]
@@ -150,14 +146,12 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\cilkdatan}
 \caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Data-parallel} algorithm in \textbf{Cilk}.}
 \label{res-tbl:2-data-n}
 }
 \end{table}
 
-\clearpage
 \begin{table}[h!]
 \centering
 \tiny{
@@ -178,7 +172,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\cilktaskn}
 \caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Task-parallel} algorithm in \textbf{Cilk}.}
 \label{res-tbl:2-task-n}
@@ -206,7 +199,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\cilkspeedup}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Task-parallel} algorithm for $n=2^{28}$ in \textbf{Cilk}.}
 \label{res-tbl:2-speedup}
@@ -236,7 +228,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixonehundredkcustom}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Custom} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-custom-100k}
@@ -263,7 +254,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixonehundredknative}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Native} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-native-100k}
@@ -290,14 +280,13 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixonehundredkseq}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Sequential} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-seq-100k}
 }
 \end{table}
 
-
+\clearpage
 \subsection{Speedup for $n=2^{24}$}
 \begin{table}[h!]
 \centering
@@ -319,7 +308,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixpowtwentyfourcustom}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Custom} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-custom-pow24}
@@ -346,7 +334,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixpowtwentyfournative}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Native} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-native-pow24}
@@ -373,14 +360,13 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixpowtwentyfourseq}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Sequential} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-seq-pow24}
 }
 \end{table}
 
-
+\clearpage
 \subsection{Speedup for $n=2^{26}$}
 \begin{table}[h!]
 \centering
@@ -402,7 +388,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixpowtwentysixcustom}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Custom} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-custom-pow26}
@@ -429,7 +414,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixpowtwentysixnative}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Native} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-native-pow26}
@@ -456,7 +440,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixpowtwentysixseq}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Sequential} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-seq-pow26}
@@ -486,7 +469,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixpowtwentyeightcustom}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Custom} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-custom-pow28}
@@ -513,7 +495,7 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
+	%%skip rows between index={1}{2},
 ]{\mpiprefixpowtwentyeightnative}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Native} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-native-pow28}
@@ -540,7 +522,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\mpiprefixpowtwentyeightseq}
 \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Sequential} scan algorithm in \textbf{MPI}.}
 \label{res-tbl:3-2-seq-pow28}
@@ -570,7 +551,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\tilingvarprocsA}
   \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{1000x100000 matrix}.}
 \label{res-tbl:3-tilingvarprocsA}
@@ -598,7 +578,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\falsesharingvarprocsA}
   \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{1000x100000 matrix}.}
 \label{res-tbl:3-falsesharingvarprocsA}
@@ -627,7 +606,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\tilingvarprocsB}
   \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{100000x1000 matrix}.}
 \label{res-tbl:3-tilingvarprocsB}
@@ -656,7 +634,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\falsesharingvarprocsB}
   \caption{Benchmark results showing \textbf{run time per number of threads} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{100000x1000 matrix}.}
 \label{res-tbl:3-falsesharingvarprocsB}
@@ -688,7 +665,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\falsesharingFixedMA}
   \caption{Benchmark results showing \textbf{run time per N} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{Matrix with a fixed M}.}
 \label{res-tbl:3-falsesharingFixedMA}
@@ -716,7 +692,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\falsesharingFixedMA}
   \caption{Benchmark results showing \textbf{run time per N} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{Matrix with a fixed M}.}
 \label{res-tbl:3-tilingFixedMA}
@@ -746,7 +721,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\falsesharingFixedMA}
   \caption{Benchmark results showing \textbf{run time per M} of the \textbf{False Sharing Algorithm} in \textbf{Open-MP} for a \textbf{Matrix with a fixed N}.}
 \label{res-tbl:3-falsesharingFixedNA}
@@ -774,7 +748,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\falsesharingFixedMA}
   \caption{Benchmark results showing \textbf{run time per M} of the \textbf{Tiling Algorithm} in \textbf{Open-MP} for a \textbf{Matrix with a fixed N}.}
 \label{res-tbl:3-tilingFixedNA}
@@ -805,7 +778,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\AllgatherFixedProcs}
 \caption{Benchmark results showing the \textbf{MPI\_Allgather} implementation with \textbf{NEC-MPI} for a \textbf{fixed proc size of 10 } and a \textbf{variable N (100, 500, 1000, 5000, 10000)}.}
 \label{res-tbl:3-allgatherFixedProc}
@@ -835,7 +807,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\ReduceScatterFixedProcs}
 \caption{Benchmark results showing the \textbf{MPI\_ReduceScatter} implementation with \textbf{NEC-MPI} for a \textbf{fixed proc size of 10 } and a \textbf{variable N (100, 500, 1000, 5000, 10000)}.}
 \label{res-tbl:3-reduceScatterFixedProc}
@@ -866,7 +837,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\AllgatherVariableProcs}
   \caption{Benchmark results showing the \textbf{ MPI\_Allgather} implementation with \textbf{NEC-MPI} for a \textbf{fixed size N of 10000 } and \textbf{variable procs 1..10}.}
 \label{res-tbl:3-allgatherVariableProc}
@@ -896,7 +866,6 @@
 	columns/max/.style ={column name=Maximum,	column type=S},
 	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
 	every last row/.style={after row=\bottomrule},
-	skip rows between index={1}{2},
 ]{\ReduceScatterVariableProcs}
   \caption{Benchmark results showing the \textbf{ MPI\_ReduceScatter} implementation with \textbf{NEC-MPI} for a \textbf{fixed size N of 10000 } and \textbf{ variable procs 1..10 }.}
 \label{res-tbl:3-reduceScatterVariableProc}
