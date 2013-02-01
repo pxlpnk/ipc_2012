@@ -16,112 +16,43 @@
 	exponent-product = \cdot,
 }
 
+\newcommand{\bmtable}[5]{
+\begin{table}[h!]
+\centering
+\tiny{
+\setlength\tabcolsep{10pt} % wider table
+\pgfplotstabletypeset[
+	%sort, % done externally
+	header=true,
+	string type,
+	multicolumn names, % make siunitx happy
+	columns={id,med,min,avg,max},
+	assign column name/.code={%
+		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{##1}} }%
+	},
+	columns/id/.style ={column name={\shortstack{#5}}, column type={S[scientific-notation=false,table-format=#4]}, int detect},
+	columns/min/.style ={column name=Minimum,	column type=S},
+	columns/avg/.style ={column name=Average,	column type=S},
+	columns/med/.style ={column name=Median,	column type=S},
+	columns/max/.style ={column name=Maximum,	column type=S},
+	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
+	every last row/.style={after row=\bottomrule},
+]{#1}
+\caption{#3}
+\label{#2}
+}
+\end{table}
+}
+
 \chapter{Benchmark Data}
 \section{OpenMP Prefix Sums}
+\bmtable{\openmpprefixseqn}{res-tbl:1-1-seq-n}{Benchmark results showing \textbf{run time per instance size} of the \textbf{Sequential algorithm} in \textbf{OpenMP}.}{9}{Instance\\Size}
 
-\begin{table}[h!]
-\centering
-\tiny{
-\setlength\tabcolsep{10pt} % wider table
-\pgfplotstabletypeset[
-	%sort, % done externally
-	header=true,
-	string type,
-	multicolumn names, % make siunitx happy
-	columns={id,med,min,avg,max},
-	assign column name/.code={%
-		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
-	},
-	columns/id/.style ={column name={\shortstack{Instance\\Size}}, column type={S[scientific-notation=false,table-format=9]}, int detect},
-	columns/min/.style ={column name=Minimum,	column type=S},
-	columns/avg/.style ={column name=Average,	column type=S},
-	columns/med/.style ={column name=Median,	column type=S},
-	columns/max/.style ={column name=Maximum,	column type=S},
-	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
-	every last row/.style={after row=\bottomrule},
-]{\openmpprefixseqn}
-\caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Sequential algorithm} in \textbf{OpenMP}.}
-\label{res-tbl:1-1-seq-n}
-}
-\end{table}
+\bmtable{\openmpprefixauxarrn}{res-tbl:1-1-auxarr-n}{Benchmark results showing \textbf{run time per instance size} of the \textbf{Auxiliary algorithm} in \textbf{OpenMP}.}{9}{Instance\\Size}
 
-\begin{table}[h!]
-\centering
-\tiny{
-\setlength\tabcolsep{10pt} % wider table
-\pgfplotstabletypeset[
-	%sort, % done externally
-	header=true,
-	string type,
-	multicolumn names, % make siunitx happy
-	columns={id,med,min,avg,max},
-	assign column name/.code={%
-		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
-	},
-	columns/id/.style ={column name={\shortstack{Instance\\Size}}, column type={S[scientific-notation=false,table-format=9]}, int detect},
-	columns/min/.style ={column name=Minimum,	column type=S},
-	columns/avg/.style ={column name=Average,	column type=S},
-	columns/med/.style ={column name=Median,	column type=S},
-	columns/max/.style ={column name=Maximum,	column type=S},
-	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
-	every last row/.style={after row=\bottomrule},
-]{\openmpprefixauxarrn}
-\caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Auxiliary Array algorithm} in \textbf{OpenMP}.}
-\label{res-tbl:1-1-auxarr-n}
-}
-\end{table}
+\bmtable{\openmpprefixinplacen}{res-tbl:1-1-inplace-n}{Benchmark results showing \textbf{run time per instance size} of the \textbf{Inplace algorithm} in \textbf{OpenMP}.}{9}{Instance\\Size}
 
-\begin{table}[h!]
-\centering
-\tiny{
-\setlength\tabcolsep{10pt} % wider table
-\pgfplotstabletypeset[
-	%sort, % done externally
-	header=true,
-	string type,
-	multicolumn names, % make siunitx happy
-	columns={id,med,min,avg,max},
-	assign column name/.code={%
-		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
-	},
-	columns/id/.style ={column name={\shortstack{Instance\\Size}}, column type={S[scientific-notation=false,table-format=9]}, int detect},
-	columns/min/.style ={column name=Minimum,	column type=S},
-	columns/avg/.style ={column name=Average,	column type=S},
-	columns/med/.style ={column name=Median,	column type=S},
-	columns/max/.style ={column name=Maximum,	column type=S},
-	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
-	every last row/.style={after row=\bottomrule},
-]{\openmpprefixinplacen}
-\caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Inplace algorithm} in \textbf{OpenMP}.}
-\label{res-tbl:1-1-inplace-n}
-}
-\end{table}
-
-\begin{table}[h!]
-\centering
-\tiny{
-\setlength\tabcolsep{10pt} % wider table
-\pgfplotstabletypeset[
-	%sort, % done externally
-	header=true,
-	string type,
-	multicolumn names, % make siunitx happy
-	columns={id,med,min,avg,max},
-	assign column name/.code={%
-		\pgfkeyssetvalue{/pgfplots/table/column name}{\multicolumn{1}{c}{\multirow{2}{*}{#1}} }%
-	},
-	columns/id/.style ={column name={\shortstack{Instance\\Size}}, column type={S[scientific-notation=false,table-format=9]}, int detect},
-	columns/min/.style ={column name=Minimum,	column type=S},
-	columns/avg/.style ={column name=Average,	column type=S},
-	columns/med/.style ={column name=Median,	column type=S},
-	columns/max/.style ={column name=Maximum,	column type=S},
-	every head row/.style={before row=\toprule, after row=\\\midrule\endhead},
-	every last row/.style={after row=\bottomrule},
-]{\openmpprefixhillisn}
-\caption{Benchmark results showing \textbf{run time per instance size} of the \textbf{Hillis algorithm} in \textbf{OpenMP}.}
-\label{res-tbl:1-1-hillis-n}
-}
-\end{table}
+\bmtable{\openmpprefixhillisn}{res-tbl:1-1-hillis-n}{Benchmark results showing \textbf{run time per instance size} of the \textbf{Hillis algorithm} in \textbf{OpenMP}.}{9}{Instance\\Size}
 
 \clearpage
 \section{Cilk Prefix Sums}
