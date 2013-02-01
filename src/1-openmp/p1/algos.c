@@ -17,12 +17,15 @@ void seq(ATYPE *x, uint n, uint *opsp) {
 }
 
 void reduction(ATYPE *x, uint n, uint *opsp) {
+	uint ops = *opsp;
 	uint sum = x[0];
-	#pragma omp parallel for ordered reduction(+:sum)
+	#pragma omp parallel for ordered reduction(+:sum) reduction(+: ops)
 	for (uint i = 1; i < n; i++) {
 		x[i] = sum;
 		sum += x[i];
+		ops++;
 	}
+	*opsp = ops;
 }
 
 void inplace(ATYPE *x, uint n, uint *opsp) {
