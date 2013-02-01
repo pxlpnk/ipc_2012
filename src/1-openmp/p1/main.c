@@ -108,6 +108,9 @@ int main (int argc, char *argv[]) {
 
 	if (t > 0) {
 		omp_set_num_threads(t);
+	} else {
+		t = omp_get_max_threads();
+		omp_set_num_threads(t);
 	}
 
 
@@ -127,7 +130,7 @@ int main (int argc, char *argv[]) {
 	uint ops = 0;
 	double totaltime = time_scan_func(func, &arr, n, &ops);
 
-	printf("%d additions of array elements executed in %lf seconds by 1 thread\n", ops, totaltime);
+	printf("%d additions of array elements executed in %lf seconds by %d threads\n", ops, totaltime, t);
 
 	if (n < 100)
 		printArrs(cor, arr, n);
