@@ -10,3 +10,24 @@ mpi prefix sum:
 
 T(local sum(n/p) + Exscan(p) + local add(n/p))
 2n/p T(sum op) + n log(n) T(message transfer time of one ATYPE-equivalent)
+
+
+== mpi matrix vector multiplication:==
+Assumptions: you may assume that p divides n. Bonus: what if not?
+
+If p does not divide n for example n=10992 p=500, n/p = 21.984 we have multiple opportunities
+
+* we round down to the next integer and let one process do the extra work of the rest. this could result into having a longer time for the last process to finish!
+* we round up and have on process doing less work. In some cases with a small n this could result into having processes doing no work at all.
+
+
+
+
+Theory bonus:
+both algorithms run in O(n^2/p+n) operations, and are scalable
+for up to p processes. Is it possible to combine the two
+algorithms to achieve scalability to larger numbers of
+processes?
+
+
+aeh??
