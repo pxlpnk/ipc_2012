@@ -1,6 +1,7 @@
 known problems:
 * tables w/o two-line headers did not show the second row
 * openmp p1 did not set the number of threads explicitly to max (and hence depended on the implementation to do so for -p 0)
+* speedup is calculated relative to optimal (sequential) algorithm. we did use the term inappropriately, "scalability" or simply "runtime over threads" would have been a better alternative.
 
 openmp prefix sum:
 WTF? :/
